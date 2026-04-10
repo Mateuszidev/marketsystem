@@ -4,15 +4,14 @@ import Link from "next/link";
 import { useCartStore } from "@/store/cart-store";
 
 export function CartButton() {
+  const hasHydrated = useCartStore((state) => state.hasHydrated);
   const count = useCartStore((state) => state.totalItems());
+  const displayCount = hasHydrated ? count : 0;
 
   return (
-    <Link
-      href="/carrinho"
-      className="inline-flex items-center gap-2 rounded-full bg-[var(--color-brand)] px-4 py-2 text-sm font-semibold text-white"
-    >
+    <Link href="/carrinho" className="bp-cart-button">
       Carrinho
-      <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs">{count}</span>
+      <span className="bp-cart-count">{displayCount}</span>
     </Link>
   );
 }

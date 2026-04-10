@@ -14,7 +14,7 @@ import { useCartStore } from "@/store/cart-store";
 import type { FulfillmentType, StoreSettingsDTO } from "@/types/order";
 
 export function CheckoutForm({ settings }: { settings: StoreSettingsDTO }) {
-  const { items, subtotal, clearCart } = useCartStore();
+  const { items, subtotal, clearCart, hasHydrated } = useCartStore();
   const [submitError, setSubmitError] = useState("");
   const hasAvailableMethod = settings.acceptsDelivery || settings.acceptsPickup;
   const defaultFulfillmentType: FulfillmentType = settings.acceptsDelivery ? "delivery" : "pickup";
@@ -41,6 +41,22 @@ export function CheckoutForm({ settings }: { settings: StoreSettingsDTO }) {
   const isPickup = fulfillmentType === "pickup";
   const estimatedDeliveryFee = isPickup ? 0 : settings.deliveryFee;
   const estimatedTotal = estimatedSubtotal + estimatedDeliveryFee;
+
+  if (!hasHydrated) {
+    return (
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <Card>
+          <h1 className="text-3xl font-black tracking-tight text-[var(--color-text)]">Finalizar pedido</h1>
+          <p className="mt-2 text-sm text-stone-600">Carregando os itens salvos no carrinho para montar o resumo do pedido.</p>
+        </Card>
+
+        <Card className="h-fit">
+          <p className="text-sm text-stone-500">Resumo estimado</p>
+          <p className="mt-4 text-sm text-stone-600">Sincronizando carrinho...</p>
+        </Card>
+      </div>
+    );
+  }
 
   const onSubmit = form.handleSubmit(async (values) => {
     if (items.length === 0) {

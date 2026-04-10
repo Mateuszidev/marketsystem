@@ -1,8 +1,12 @@
 export function SiteFooter() {
   return (
-    <footer className="border-t border-black/5 py-8">
-      <div className="mx-auto max-w-7xl px-4 text-sm text-stone-500 sm:px-6 lg:px-8">
-        MVP de catálogo web com carrinho, persistência local e finalização via WhatsApp.
+    <footer className="bp-footer">
+      <div className="bp-container bp-footer-inner">
+        <div>
+          <p className="bp-footer-highlight">Mercado digital com cara de encarte</p>
+          <p className="bp-footer-copy">Carrinho persistente, catalogo rapido e finalizacao via WhatsApp.</p>
+        </div>
+        <p className="bp-footer-copy">Feito para vender com rapidez no celular e no desktop.</p>
       </div>
     </footer>
   );

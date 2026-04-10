@@ -6,26 +6,34 @@ import type { ProductListItem } from "@/types/product";
 
 export function ProductCard({ product }: { product: ProductListItem }) {
   return (
-    <Card className="flex h-full flex-col overflow-hidden p-0">
-      <div className="relative h-52 bg-stone-100">
+    <Card className="bp-product-card h-full p-0">
+      <div
+        className="bp-product-img"
+        style={{
+          background: product.imageUrl
+            ? "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.02) 100%)"
+            : "linear-gradient(135deg, rgba(247,194,0,0.2) 0%, rgba(217,43,43,0.08) 100%)",
+        }}
+      >
         {product.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
         ) : (
-          <div className="flex h-full items-center justify-center text-sm text-stone-400">Sem imagem</div>
+          <div className="text-sm font-bold uppercase tracking-[0.18em] text-[var(--color-brand)]">Sem imagem</div>
         )}
+        {!product.available ? <span className="bp-product-tag">Sem estoque</span> : <span className="bp-product-tag">Destaque</span>}
       </div>
-      <div className="flex flex-1 flex-col gap-4 p-5">
+      <div className="bp-product-body flex flex-1 flex-col">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-sm text-stone-500">{product.categoryName}</p>
-            <h3 className="text-lg font-semibold text-[var(--color-text)]">{product.name}</h3>
+            <p className="bp-product-unit">{product.categoryName}</p>
+            <h3 className="bp-product-name">{product.name}</h3>
           </div>
-          {!product.available ? <Badge className="bg-amber-100 text-amber-700">Sem estoque</Badge> : null}
+          {product.available ? <Badge className="badge badge--yellow">Disponivel</Badge> : null}
         </div>
-        {product.description ? <p className="text-sm leading-6 text-stone-600">{product.description}</p> : null}
-        <div className="mt-auto space-y-4">
-          <p className="text-2xl font-black tracking-tight text-[var(--color-text)]">{formatCurrencyBRL(product.price)}</p>
+        {product.description ? <p className="mt-3 text-sm leading-6 text-stone-600">{product.description}</p> : null}
+        <div className="bp-product-footer mt-auto">
+          <p className="bp-product-price">{formatCurrencyBRL(product.price)}</p>
           <AddToCartButton product={product} />
         </div>
       </div>

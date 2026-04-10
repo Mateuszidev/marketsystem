@@ -15,6 +15,8 @@ export type CartItem = {
 
 type CartState = {
   items: CartItem[];
+  hasHydrated: boolean;
+  setHasHydrated: (value: boolean) => void;
   addItem: (product: ProductListItem) => void;
   increaseItem: (productId: number) => void;
   decreaseItem: (productId: number) => void;
@@ -28,6 +30,8 @@ export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      hasHydrated: false,
+      setHasHydrated: (value) => set({ hasHydrated: value }),
       addItem: (product) =>
         set((state) => {
           const existing = state.items.find((item) => item.productId === product.id);
@@ -78,6 +82,9 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: "market-cart",
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     },
   ),
 );

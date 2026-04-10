@@ -6,20 +6,26 @@ type SiteHeaderProps = {
 };
 
 export function SiteHeader({ storeName }: SiteHeaderProps) {
+  const logoLabel = storeName.slice(0, 2).toUpperCase();
+
   return (
-    <header className="sticky top-0 z-30 border-b border-black/5 bg-[rgba(248,245,239,0.85)] backdrop-blur">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-        <div>
-          <Link href="/" className="text-lg font-black tracking-tight text-[var(--color-text)]">
-            {storeName}
-          </Link>
-          <p className="text-xs uppercase tracking-[0.18em] text-stone-500">Catálogo e pedidos por WhatsApp</p>
-        </div>
-        <nav className="flex items-center gap-2">
-          <Link href="/produtos" className="rounded-full px-4 py-2 text-sm font-medium text-stone-700 hover:bg-black/5">
+    <header className="bp-header">
+      <div className="bp-container flex items-center justify-between gap-4">
+        <Link href="/" className="bp-logo" aria-label={`Ir para a home da loja ${storeName}`}>
+          <div className="bp-logo-icon flex items-center justify-center rounded-full border-2 border-white/35 bg-white/12 text-sm font-extrabold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.22)]">
+            {logoLabel}
+          </div>
+          <div className="bp-logo-text">
+            <span className="bp-logo-main">{storeName}</span>
+            <span className="bp-logo-sub">catalogo e pedidos</span>
+          </div>
+        </Link>
+
+        <nav className="bp-nav">
+          <Link href="/produtos" className="bp-nav-link">
             Produtos
           </Link>
-          <Link href="/admin" className="rounded-full px-4 py-2 text-sm font-medium text-stone-700 hover:bg-black/5">
+          <Link href="/admin" className="bp-nav-link">
             Admin
           </Link>
           <CartButton />

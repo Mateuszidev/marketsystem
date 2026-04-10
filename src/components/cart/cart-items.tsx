@@ -7,8 +7,17 @@ import { formatCurrencyBRL } from "@/lib/currency";
 import { useCartStore } from "@/store/cart-store";
 
 export function CartItems() {
-  const { items, subtotal, increaseItem, decreaseItem, removeItem } = useCartStore();
+  const { items, subtotal, increaseItem, decreaseItem, removeItem, hasHydrated } = useCartStore();
   const total = subtotal();
+
+  if (!hasHydrated) {
+    return (
+      <Card className="text-center">
+        <h2 className="text-xl font-semibold">Carregando carrinho...</h2>
+        <p className="mt-2 text-sm text-stone-600">Estamos sincronizando os itens salvos neste navegador.</p>
+      </Card>
+    );
+  }
 
   if (items.length === 0) {
     return (

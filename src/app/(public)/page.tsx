@@ -16,70 +16,78 @@ export default async function HomePage() {
 
   return (
     <div className="space-y-10">
-      <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-        <Card className="overflow-hidden bg-[linear-gradient(135deg,#17352d_0%,#0d8a63_60%,#9fd9bc_100%)] text-white">
-          <Badge className="bg-white/15 text-white">Mercado bonPrix</Badge>
-          <h1 className="mt-6 max-w-2xl text-4xl font-black tracking-tight sm:text-5xl">{settings.storeName}</h1>
-          <p className="mt-4 max-w-xl text-sm leading-7 text-white/80">
-            Encarte de produtos! faça o seu pedido e finalize no WhatsApp. 
+      <section className="bp-hero">
+        <div className="bp-hero-card">
+          <Badge className="badge">pedido rapido no whatsapp</Badge>
+          <h1 className="bp-hero-title">
+            Ofertas fresquinhas da <span>{settings.storeName}</span>
+          </h1>
+          <p className="bp-hero-desc">
+            Monte seu carrinho como num encarte moderno, acompanhe os destaques da loja e finalize o pedido em poucos toques.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/produtos" className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[#17352d]">
-              Ver catálogo
+          <div className="bp-hero-actions">
+            <Link href="/produtos" className="btn btn--primary">
+              Ver catalogo
             </Link>
-            <Link href="/admin" className="rounded-2xl border border-white/20 px-5 py-3 text-sm font-semibold text-white">
+            <Link href="/admin" className="btn btn--outline">
               Abrir admin
             </Link>
           </div>
-        </Card>
+        </div>
 
-        <Card>
-          <p className="text-sm uppercase tracking-[0.18em] text-stone-500">Categorias</p>
-          <div className="mt-4 flex flex-wrap gap-3">
+        <Card className="bp-cat-card">
+          <p className="bp-section-label">Categorias em destaque</p>
+          <div className="bp-cat-pills">
             {categories.map((category) => (
-              <Link
-                key={category.id}
-                href={`/categoria/${category.slug}`}
-                className="rounded-full border border-black/10 px-4 py-2 text-sm font-medium text-stone-700 transition hover:border-[var(--color-brand)] hover:text-[var(--color-brand)]"
-              >
+              <Link key={category.id} href={`/categoria/${category.slug}`} className="bp-cat-pill">
                 {category.name}
               </Link>
             ))}
           </div>
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
+          <div className="bp-stats">
             <div>
-              <p className="text-3xl font-black tracking-tight">{products.length}</p>
-              <p className="text-sm text-stone-500">Produtos ativos</p>
+              <p className="bp-stat-num">{products.length}</p>
+              <p className="bp-stat-lbl">Produtos ativos</p>
             </div>
             <div>
-              <p className="text-3xl font-black tracking-tight">{categories.length}</p>
-              <p className="text-sm text-stone-500">Categorias</p>
+              <p className="bp-stat-num">{categories.length}</p>
+              <p className="bp-stat-lbl">Categorias</p>
             </div>
             <div>
-              <p className="text-3xl font-black tracking-tight">WhatsApp</p>
-              <p className="text-sm text-stone-500">Finalização fora do site</p>
+              <p className="bp-stat-num">Zap</p>
+              <p className="bp-stat-lbl">Checkout conversacional</p>
             </div>
           </div>
         </Card>
       </section>
 
       <section className="space-y-4">
-        <div className="flex items-end justify-between gap-4">
+        <div className="bp-promo-banner">
           <div>
-            <p className="text-sm uppercase tracking-[0.18em] text-stone-500">Catálogo</p>
-            <h2 className="text-3xl font-black tracking-tight text-[var(--color-text)]">Produtos em destaque</h2>
+            <p className="bp-promo-title">Comprou, clicou, pediu.</p>
+            <p className="bp-promo-sub">Experiencia pensada para celular, com visual de tabloide premium.</p>
           </div>
-          <Link href="/produtos" className="text-sm font-semibold text-[var(--color-brand)]">
-            Ver todos
+          <Link href="/produtos" className="btn btn--ghost">
+            Explorar
+          </Link>
+        </div>
+
+        <div className="bp-section-header">
+          <div>
+            <p className="bp-section-label">Catalogo</p>
+            <h2 className="bp-section-title">Produtos em destaque</h2>
+          </div>
+          <Link href="/produtos" className="bp-view-all">
+            Ver todos -&gt;
           </Link>
         </div>
         {products.length === 0 ? (
           <EmptyState
             title="Nenhum produto ativo cadastrado."
-            description="Cadastre produtos na área administrativa para liberar o catálogo."
+            description="Cadastre produtos na area administrativa para liberar o catalogo."
           />
         ) : (
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+          <div className="bp-product-grid">
             {products.slice(0, 8).map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
