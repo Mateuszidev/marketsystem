@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <title>Guia de Funcionalidades - MarketSystem</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 18mm 15mm;
+      }
+
+      :root {
+        --ink: #1f2937;
+        --muted: #5b6472;
+        --brand: #0d8a63;
+        --brand-soft: #e9f7f1;
+        --line: #d7dee7;
+        --bg: #f7f8fa;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Arial, sans-serif;
+        color: var(--ink);
+        background: white;
+        line-height: 1.45;
+        font-size: 12px;
+      }
+
+      h1, h2, h3 {
+        margin: 0 0 8px;
+        line-height: 1.2;
+      }
+
+      h1 {
+        font-size: 28px;
+        color: var(--brand);
+      }
+
+      h2 {
+        margin-top: 24px;
+        padding-bottom: 6px;
+        font-size: 18px;
+        border-bottom: 2px solid var(--line);
+      }
+
+      h3 {
+        margin-top: 16px;
+        font-size: 14px;
+      }
+
+      p {
+        margin: 8px 0;
+      }
+
+      ul, ol {
+        margin: 8px 0 8px 20px;
+        padding: 0;
+      }
+
+      li {
+        margin: 4px 0;
+      }
+
+      code {
+        padding: 1px 5px;
+        border-radius: 4px;
+        background: var(--bg);
+        font-family: Consolas, "Courier New", monospace;
+        font-size: 11px;
+      }
+
+      .hero {
+        padding: 18px 20px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: linear-gradient(135deg, var(--brand-soft), white);
+      }
+
+      .note, .warn {
+        margin: 12px 0;
+        padding: 12px 14px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+      }
+
+      .note {
+        background: #f8fbff;
+      }
+
+      .warn {
+        background: #fff7ed;
+        border-color: #fed7aa;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+
+      .card {
+        padding: 12px 14px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: white;
+      }
+
+      .path {
+        font-weight: 600;
+        color: var(--brand);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 8px;
+      }
+
+      th, td {
+        border: 1px solid var(--line);
+        padding: 8px;
+        vertical-align: top;
+        text-align: left;
+      }
+
+      th {
+        background: var(--bg);
+      }
+
+      .small {
+        color: var(--muted);
+        font-size: 11px;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="hero">
+      <h1>Guia de Funcionalidades do MarketSystem</h1>
+      <p>Este documento mostra onde mexer nas principais funcionalidades do projeto e destaca exatamente onde configurar o número do WhatsApp.</p>
+      <p class="small">Projeto localizado em <code>C:\Users\Mateus Rodrigues\Desktop\marketsystem</code></p>
+    </section>
+
+    <h2>1. Onde colocar o número do WhatsApp</h2>
+    <div class="warn">
+      <strong>Principal local para editar:</strong> tela admin <code>/admin/configuracoes</code>.
+    </div>
+
+    <ol>
+      <li>Abra o sistema localmente.</li>
+      <li>Acesse <code>/admin/configuracoes</code>.</li>
+      <li>No campo <code>WhatsApp</code>, informe o número da loja.</li>
+      <li>Clique em <code>Salvar configurações</code>.</li>
+    </ol>
+
+    <p><strong>Arquivos envolvidos:</strong></p>
+    <ul>
+      <li><span class="path">src/app/admin/configuracoes/page.tsx</span>: carrega a tela de configurações.</li>
+      <li><span class="path">src/components/admin/store-settings-form.tsx</span>: mostra o campo <code>WhatsApp</code> e envia o formulário.</li>
+      <li><span class="path">src/app/api/store/route.ts</span>: recebe o <code>PUT</code> do formulário.</li>
+      <li><span class="path">src/services/store-service.ts</span>: salva o número em <code>StoreSettings.whatsappNumber</code>.</li>
+      <li><span class="path">src/services/order-service.ts</span>: usa esse número ao criar o link do WhatsApp.</li>
+    </ul>
+
+    <div class="note">
+      <strong>Fallback:</strong> se ainda não existir configuração da loja no banco, o sistema também pode usar <code>NEXT_PUBLIC_WHATSAPP_FALLBACK_NUMBER</code> no arquivo <code>.env</code>. Isso serve como reserva, mas o ideal é salvar o número pela tela admin.
+    </div>
+
+    <h2>2. Fluxo do pedido</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Etapa</th>
+          <th>Onde mexer</th>
+          <th>O que faz</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Carrinho</td>
+          <td><code>src/store/cart-store.ts</code></td>
+          <td>Guarda os itens no navegador com Zustand.</td>
+        </tr>
+        <tr>
+          <td>Botão adicionar</td>
+          <td><code>src/components/cart/add-to-cart-button.tsx</code></td>
+          <td>Adiciona o produto ao carrinho.</td>
+        </tr>
+        <tr>
+          <td>Checkout</td>
+          <td><code>src/components/cart/checkout-form.tsx</code></td>
+          <td>Formulário com nome, telefone, entrega/retirada e envio do pedido.</td>
+        </tr>
+        <tr>
+          <td>Validação</td>
+          <td><code>src/lib/validations.ts</code></td>
+          <td>Define o que é obrigatório no pedido.</td>
+        </tr>
+        <tr>
+          <td>Criação do pedido</td>
+          <td><code>src/services/order-service.ts</code></td>
+          <td>Valida estoque, calcula subtotal, taxa, total e gera o WhatsApp.</td>
+        </tr>
+        <tr>
+          <td>Mensagem final</td>
+          <td><code>src/lib/whatsapp.ts</code></td>
+          <td>Monta o texto enviado para a conversa da loja.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>3. Configurações da loja</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Nome da loja</h3>
+        <p>Campo exibido no topo da loja pública.</p>
+        <p><code>src/components/admin/store-settings-form.tsx</code></p>
+      </div>
+      <div class="card">
+        <h3>WhatsApp</h3>
+        <p>Número usado para abrir <code>wa.me</code> no checkout.</p>
+        <p><code>src/components/admin/store-settings-form.tsx</code></p>
+      </div>
+      <div class="card">
+        <h3>Taxa de entrega</h3>
+        <p>Aplicada quando o cliente escolhe entrega.</p>
+        <p><code>src/services/order-service.ts</code></p>
+      </div>
+      <div class="card">
+        <h3>Pedido mínimo</h3>
+        <p>Bloqueia pedidos abaixo do valor definido.</p>
+        <p><code>src/lib/validations.ts</code> e <code>src/services/order-service.ts</code></p>
+      </div>
+      <div class="card">
+        <h3>Aceita retirada</h3>
+        <p>Libera pedidos sem endereço.</p>
+        <p><code>src/components/cart/checkout-form.tsx</code></p>
+      </div>
+      <div class="card">
+        <h3>Aceita entrega</h3>
+        <p>Libera pedidos com taxa e endereço.</p>
+        <p><code>src/components/cart/checkout-form.tsx</code></p>
+      </div>
+    </div>
+
+    <h2>4. Produtos</h2>
+    <ul>
+      <li><code>src/app/admin/produtos/page.tsx</code>: lista os produtos no admin.</li>
+      <li><code>src/components/admin/product-form.tsx</code>: formulário de cadastro/edição.</li>
+      <li><code>src/services/product-service.ts</code>: regras de listagem, criação, edição e desativação.</li>
+      <li><code>src/app/api/products/route.ts</code> e <code>src/app/api/products/[id]/route.ts</code>: endpoints do produto.</li>
+    </ul>
+
+    <p>Se você quiser alterar campos do produto, como preço, descrição, imagem ou SKU, normalmente vai mexer no formulário do admin e no serviço.</p>
+
+    <h2>5. Categorias</h2>
+    <ul>
+      <li><code>src/app/admin/categorias/page.tsx</code>: lista categorias.</li>
+      <li><code>src/components/admin/category-form.tsx</code>: formulário de categoria.</li>
+      <li><code>src/services/category-service.ts</code>: regras de categoria.</li>
+      <li><code>src/app/api/categories/route.ts</code> e <code>src/app/api/categories/[id]/route.ts</code>: endpoints.</li>
+    </ul>
+
+    <h2>6. Estoque</h2>
+    <ul>
+      <li><code>src/components/admin/inventory-form.tsx</code>: tela para ajustar quantidade e estoque mínimo.</li>
+      <li><code>src/services/inventory-service.ts</code>: regra de atualização de estoque.</li>
+      <li><code>src/app/api/inventory/[productId]/route.ts</code>: endpoint.</li>
+    </ul>
+
+    <div class="note">
+      Hoje o sistema consulta o estoque ao criar o pedido. Se quiser baixar estoque automaticamente ao confirmar pedido, essa mudança deve começar em <code>src/services/order-service.ts</code>.
+    </div>
+
+    <h2>7. Pedidos e status</h2>
+    <ul>
+      <li><code>src/app/admin/pedidos/page.tsx</code>: lista de pedidos.</li>
+      <li><code>src/app/admin/pedidos/[id]/page.tsx</code>: detalhe do pedido.</li>
+      <li><code>src/components/admin/order-status-form.tsx</code>: troca o status.</li>
+      <li><code>src/services/order-service.ts</code>: leitura, criação e atualização de status.</li>
+    </ul>
+
+    <p>Os status disponíveis hoje são: <code>pending</code>, <code>confirmed</code>, <code>cancelled</code> e <code>delivered</code>.</p>
+
+    <h2>8. Área pública</h2>
+    <ul>
+      <li><code>src/app/(public)/page.tsx</code>: home da loja.</li>
+      <li><code>src/app/(public)/produtos/page.tsx</code>: catálogo completo.</li>
+      <li><code>src/app/(public)/categoria/[slug]/page.tsx</code>: catálogo filtrado por categoria.</li>
+      <li><code>src/components/product/product-card.tsx</code>: card visual de cada produto.</li>
+      <li><code>src/components/layout/site-header.tsx</code>: cabeçalho da loja.</li>
+      <li><code>src/components/layout/site-footer.tsx</code>: rodapé.</li>
+    </ul>
+
+    <h2>9. Banco de dados</h2>
+    <p>O desenho do banco está em <code>prisma/schema.prisma</code>.</p>
+    <p>Modelos principais:</p>
+    <ul>
+      <li><code>Category</code></li>
+      <li><code>Product</code></li>
+      <li><code>Inventory</code></li>
+      <li><code>Order</code></li>
+      <li><code>OrderItem</code></li>
+      <li><code>StoreSettings</code></li>
+    </ul>
+
+    <div class="warn">
+      Se você adicionar um campo novo no banco, normalmente precisa mexer em 4 lugares:
+      <ol>
+        <li><code>prisma/schema.prisma</code></li>
+        <li>migration do Prisma</li>
+        <li><code>src/lib/validations.ts</code></li>
+        <li>o serviço e o formulário da funcionalidade</li>
+      </ol>
+    </div>
+
+    <h2>10. Variáveis de ambiente importantes</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Variável</th>
+          <th>Para que serve</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>DATABASE_URL</code></td>
+          <td>Conexão principal usada pela aplicação.</td>
+        </tr>
+        <tr>
+          <td><code>DIRECT_URL</code></td>
+          <td>Conexão usada pelo Prisma para migration e comandos de schema.</td>
+        </tr>
+        <tr>
+          <td><code>NEXT_PUBLIC_APP_URL</code></td>
+          <td>URL base da aplicação.</td>
+        </tr>
+        <tr>
+          <td><code>NEXT_PUBLIC_WHATSAPP_FALLBACK_NUMBER</code></td>
+          <td>Número reserva caso a loja ainda não tenha um número salvo em <code>StoreSettings</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>11. Resumo rápido: onde editar o WhatsApp</h2>
+    <ol>
+      <li>Preferencialmente na tela <code>/admin/configuracoes</code>.</li>
+      <li>O campo visual fica em <code>src/components/admin/store-settings-form.tsx</code>.</li>
+      <li>O valor é salvo por <code>src/services/store-service.ts</code>.</li>
+      <li>Na criação do pedido, quem usa esse número é <code>src/services/order-service.ts</code>.</li>
+      <li>Se precisar de reserva, configure <code>NEXT_PUBLIC_WHATSAPP_FALLBACK_NUMBER</code> no <code>.env</code>.</li>
+    </ol>
+
+    <div class="note">
+      Se você quiser, no próximo passo eu também posso criar uma versão 2 deste manual com capturas de tela e setas explicando cada página do admin.
+    </div>
+  </body>
+</html>
