@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -41,6 +41,21 @@ export function CheckoutForm({ settings }: { settings: StoreSettingsDTO }) {
   const isPickup = fulfillmentType === "pickup";
   const estimatedDeliveryFee = isPickup ? 0 : settings.deliveryFee;
   const estimatedTotal = estimatedSubtotal + estimatedDeliveryFee;
+
+  useEffect(() => {
+    form.setValue(
+      "items",
+      items.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+      })),
+      {
+        shouldDirty: false,
+        shouldTouch: false,
+        shouldValidate: false,
+      },
+    );
+  }, [form, items]);
 
   if (!hasHydrated) {
     return (
@@ -163,6 +178,9 @@ export function CheckoutForm({ settings }: { settings: StoreSettingsDTO }) {
           </div>
 
           {!hasAvailableMethod ? <p className="text-sm text-rose-600">A loja está com pedidos temporariamente indisponíveis.</p> : null}
+          {form.formState.errors.items?.message ? (
+            <p className="text-sm text-rose-600">{form.formState.errors.items.message}</p>
+          ) : null}
           {submitError ? <p className="text-sm text-rose-600">{submitError}</p> : null}
 
           <Button type="submit" className="mt-2" disabled={form.formState.isSubmitting || !hasAvailableMethod}>

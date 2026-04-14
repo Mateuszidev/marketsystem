@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { CartButton } from "@/components/cart/cart-button";
 
@@ -6,14 +7,19 @@ type SiteHeaderProps = {
 };
 
 export function SiteHeader({ storeName }: SiteHeaderProps) {
-  const logoLabel = storeName.slice(0, 2).toUpperCase();
-
   return (
     <header className="bp-header">
       <div className="bp-container flex items-center justify-between gap-4">
         <Link href="/" className="bp-logo" aria-label={`Ir para a home da loja ${storeName}`}>
-          <div className="bp-logo-icon flex items-center justify-center rounded-full border-2 border-white/35 bg-white/12 text-sm font-extrabold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.22)]">
-            {logoLabel}
+          <div className="bp-logo-icon overflow-hidden rounded-full border-2 border-white/35 bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.22)]">
+            <Image
+              src="/images/logo.png"
+              alt={`Logo da loja ${storeName}`}
+              width={46}
+              height={46}
+              className="h-full w-full object-cover"
+              priority
+            />
           </div>
           <div className="bp-logo-text">
             <span className="bp-logo-main">{storeName}</span>
