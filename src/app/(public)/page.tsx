@@ -20,7 +20,7 @@ export default async function HomePage() {
         <div className="bp-hero-card">
           <Badge className="badge">pedido rapido no whatsapp</Badge>
           <h1 className="bp-hero-title">
-            Ofertas fresquinhas da <span>{settings.storeName}</span>
+            Ofertas fresquinhas do <span>{settings.storeName}</span>
           </h1>
           <p className="bp-hero-desc">
             Monte seu carrinho como num encarte moderno, acompanhe os destaques da loja e finalize o pedido em poucos toques.
@@ -54,7 +54,7 @@ export default async function HomePage() {
               <p className="bp-stat-lbl">Categorias</p>
             </div>
             <div>
-              <p className="bp-stat-num">Zap</p>
+              <p className="bp-stat-num">WhatsApp</p>
               <p className="bp-stat-lbl">Checkout conversacional</p>
             </div>
           </div>
@@ -64,8 +64,8 @@ export default async function HomePage() {
       <section className="space-y-4">
         <div className="bp-promo-banner">
           <div>
-            <p className="bp-promo-title">Comprou, clicou, pediu.</p>
-            <p className="bp-promo-sub">Experiencia pensada para celular, com visual de tabloide premium.</p>
+            <p className="bp-promo-title">Gostou, clicou, pediu.</p>
+            <p className="bp-promo-sub">Experiencia pensada para o seu melhor conforto e agilidade!</p>
           </div>
           <Link href="/produtos" className="btn btn--ghost">
             Explorar

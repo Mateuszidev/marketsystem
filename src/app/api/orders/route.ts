@@ -1,9 +1,11 @@
+import { requireAdminApiSession } from "@/lib/admin-auth";
 import { createOrderSchema } from "@/lib/validations";
 import { handleRouteError, jsonSuccess } from "@/lib/errors";
 import { orderService } from "@/services/order-service";
 
 export async function GET(request: Request) {
   try {
+    await requireAdminApiSession();
     const url = new URL(request.url);
     const status = url.searchParams.get("status") as "pending" | "confirmed" | "cancelled" | "delivered" | null;
     return jsonSuccess(await orderService.list(status || undefined));

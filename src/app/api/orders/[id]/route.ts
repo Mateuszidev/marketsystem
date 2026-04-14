@@ -1,5 +1,6 @@
-import { updateOrderStatusSchema } from "@/lib/validations";
+import { requireAdminApiSession } from "@/lib/admin-auth";
 import { handleRouteError, jsonSuccess } from "@/lib/errors";
+import { updateOrderStatusSchema } from "@/lib/validations";
 import { orderService } from "@/services/order-service";
 
 type RouteContext = {
@@ -8,6 +9,7 @@ type RouteContext = {
 
 export async function GET(_: Request, { params }: RouteContext) {
   try {
+    await requireAdminApiSession();
     const { id } = await params;
     return jsonSuccess(await orderService.getById(Number(id)));
   } catch (error) {
@@ -17,6 +19,7 @@ export async function GET(_: Request, { params }: RouteContext) {
 
 export async function PUT(request: Request, { params }: RouteContext) {
   try {
+    await requireAdminApiSession();
     const { id } = await params;
     const payload = updateOrderStatusSchema.parse(await request.json());
     return jsonSuccess(await orderService.updateStatus(Number(id), payload));

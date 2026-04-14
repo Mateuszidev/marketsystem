@@ -1,5 +1,6 @@
-import { createProductSchema } from "@/lib/validations";
+import { requireAdminApiSession } from "@/lib/admin-auth";
 import { handleRouteError, jsonSuccess } from "@/lib/errors";
+import { createProductSchema } from "@/lib/validations";
 import { productService } from "@/services/product-service";
 
 export async function GET(request: Request) {
@@ -23,6 +24,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    await requireAdminApiSession();
     const payload = createProductSchema.parse(await request.json());
     return jsonSuccess(await productService.create(payload), 201);
   } catch (error) {
