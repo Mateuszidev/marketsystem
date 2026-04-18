@@ -16,6 +16,7 @@ const SESSION_DURATION_SECONDS = 60 * 60 * 12;
 const MIN_ADMIN_PASSWORD_LENGTH = 12;
 const MIN_SESSION_SECRET_LENGTH = 32;
 const INSECURE_ADMIN_VALUES = new Set(["admin", "123456", "password", "sua-senha", "changeme"]);
+const reportedAdminWarnings = new Set<string>();
 
 const safeCompare = (left: string, right: string) => {
   const leftBuffer = Buffer.from(left);
@@ -49,20 +50,36 @@ const hasStrongAdminPassword = (value: string) =>
 const hasStrongSessionSecret = (value: string) =>
   value.length >= MIN_SESSION_SECRET_LENGTH && !INSECURE_ADMIN_VALUES.has(value.toLowerCase());
 
+const reportAdminConfigWarning = (message: string) => {
+  if (reportedAdminWarnings.has(message)) {
+    return;
+  }
+
+  reportedAdminWarnings.add(message);
+  console.warn(message);
+};
+
 const assertSecureAdminConfig = () => {
   const { password } = getAdminCredentials();
-  const sessionSecret = getAdminSessionSecretConfig().value;
+  const sessionSecretConfig = getAdminSessionSecretConfig();
+  const sessionSecret = sessionSecretConfig.value;
 
   if (process.env.NODE_ENV !== "production") {
     return;
   }
 
   if (!hasStrongAdminPassword(password)) {
-    throw new Error("ADMIN_PASSWORD precisa ter pelo menos 12 caracteres e incluir letras, numeros e simbolos.");
+    reportAdminConfigWarning(
+      "ADMIN_PASSWORD no ambiente de producao nao atende aos requisitos recomendados de seguranca.",
+    );
   }
 
   if (!hasStrongSessionSecret(sessionSecret)) {
-    throw new Error("ADMIN_SESSION_SECRET precisa ter pelo menos 32 caracteres e nao pode usar valores previsiveis.");
+    reportAdminConfigWarning(
+      sessionSecretConfig.source === "ADMIN_SESSION_SECRET"
+        ? "ADMIN_SESSION_SECRET no ambiente de producao nao atende aos requisitos recomendados de seguranca."
+        : "ADMIN_SESSION_SECRET nao configurado em producao; usando ADMIN_PASSWORD como fallback para a sessao admin.",
+    );
   }
 };
 

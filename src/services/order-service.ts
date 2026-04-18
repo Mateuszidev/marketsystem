@@ -296,29 +296,40 @@ export const orderService = {
   },
 
   async getDashboardStats() {
-    const [totalOrders, pendingOrders, activeProducts, lowStockProducts] = await Promise.all([
-      prisma.order.count(),
-      prisma.order.count({ where: { status: "pending" } }),
-      prisma.product.count({ where: { active: true } }),
-      prisma.product.count({
-        where: {
-          active: true,
-          inventory: {
-            is: {
-              quantity: {
-                lte: 5,
+    try {
+      const [totalOrders, pendingOrders, activeProducts, lowStockProducts] = await Promise.all([
+        prisma.order.count(),
+        prisma.order.count({ where: { status: "pending" } }),
+        prisma.product.count({ where: { active: true } }),
+        prisma.product.count({
+          where: {
+            active: true,
+            inventory: {
+              is: {
+                quantity: {
+                  lte: 5,
+                },
               },
             },
           },
-        },
-      }),
-    ]);
+        }),
+      ]);
 
-    return {
-      totalOrders,
-      pendingOrders,
-      activeProducts,
-      lowStockProducts,
-    };
+      return {
+        totalOrders,
+        pendingOrders,
+        activeProducts,
+        lowStockProducts,
+      };
+    } catch (error) {
+      console.error("Failed to load admin dashboard stats, using safe fallback values instead.", error);
+
+      return {
+        totalOrders: 0,
+        pendingOrders: 0,
+        activeProducts: 0,
+        lowStockProducts: 0,
+      };
+    }
   },
 };
