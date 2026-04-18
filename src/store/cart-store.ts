@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { ProductListItem } from "@/types/product";
+import type { PublicProductListItem } from "@/types/product";
 
 export type CartItem = {
   productId: number;
@@ -17,7 +17,7 @@ type CartState = {
   items: CartItem[];
   hasHydrated: boolean;
   setHasHydrated: (value: boolean) => void;
-  addItem: (product: ProductListItem) => void;
+  addItem: (product: PublicProductListItem) => void;
   increaseItem: (productId: number) => void;
   decreaseItem: (productId: number) => void;
   removeItem: (productId: number) => void;

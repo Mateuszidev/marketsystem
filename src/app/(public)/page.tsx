@@ -9,9 +9,9 @@ import { storeService } from "@/services/store-service";
 
 export default async function HomePage() {
   const [settings, categories, products] = await Promise.all([
-    storeService.get(),
+    storeService.getPublic(),
     categoryService.list(),
-    productService.list(),
+    productService.listPublic(),
   ]);
 
   return (

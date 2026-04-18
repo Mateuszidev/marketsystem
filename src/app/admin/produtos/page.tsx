@@ -7,7 +7,7 @@ import { formatCurrencyBRL } from "@/lib/currency";
 import { productService } from "@/services/product-service";
 
 export default async function AdminProdutosPage() {
-  const products = await productService.list({ includeInactive: true });
+  const products = await productService.listAdmin({ includeInactive: true });
 
   return (
     <div className="space-y-6">

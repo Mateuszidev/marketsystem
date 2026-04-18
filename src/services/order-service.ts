@@ -80,6 +80,19 @@ const mapOrderDetail = (order: {
 
 const normalizePhone = (value: string) => value.replace(/\D/g, "");
 
+const groupOrderItems = (items: CreateOrderInput["items"]) => {
+  const groupedItems = new Map<number, number>();
+
+  for (const item of items) {
+    groupedItems.set(item.productId, (groupedItems.get(item.productId) ?? 0) + item.quantity);
+  }
+
+  return [...groupedItems.entries()].map(([productId, quantity]) => ({
+    productId,
+    quantity,
+  }));
+};
+
 export const orderService = {
   async list(status?: OrderStatus) {
     const orders = await prisma.order.findMany({
@@ -106,14 +119,15 @@ export const orderService = {
     });
 
     if (!order) {
-      throw new ApiError("Pedido não encontrado.", 404);
+      throw new ApiError("Pedido nÃ£o encontrado.", 404);
     }
 
     return mapOrderDetail(order);
   },
 
   async create(input: CreateOrderInput) {
-    const uniqueIds = [...new Set(input.items.map((item) => item.productId))];
+    const groupedItems = groupOrderItems(input.items);
+    const uniqueIds = groupedItems.map((item) => item.productId);
     const products = await prisma.product.findMany({
       where: { id: { in: uniqueIds } },
       include: {
@@ -122,20 +136,20 @@ export const orderService = {
     });
 
     if (products.length !== uniqueIds.length) {
-      throw new ApiError("Um ou mais produtos não existem.", 404);
+      throw new ApiError("Um ou mais produtos nÃ£o existem.", 404);
     }
 
     const productsById = new Map(products.map((product) => [product.id, product]));
 
-    const normalizedItems: OrderItemSnapshotForMessage[] = input.items.map((item) => {
+    const normalizedItems: OrderItemSnapshotForMessage[] = groupedItems.map((item) => {
       const product = productsById.get(item.productId);
 
       if (!product) {
-        throw new ApiError("Produto inválido no pedido.", 404);
+        throw new ApiError("Produto invÃ¡lido no pedido.", 404);
       }
 
       if (!product.active) {
-        throw new ApiError(`O produto "${product.name}" não está disponível no momento.`, 409);
+        throw new ApiError(`O produto "${product.name}" nÃ£o estÃ¡ disponÃ­vel no momento.`, 409);
       }
 
       const quantity = product.inventory?.quantity ?? 0;
@@ -156,19 +170,19 @@ export const orderService = {
     });
 
     const subtotal = normalizedItems.reduce((sum, item) => sum + item.subtotal, 0);
-    const settings = await storeService.getRequired();
+    const settings = await storeService.getOrderSettings();
 
     if (input.fulfillmentType === "delivery" && !settings.acceptsDelivery) {
-      throw new ApiError("A loja não está recebendo pedidos para entrega no momento.", 409);
+      throw new ApiError("A loja nÃ£o estÃ¡ recebendo pedidos para entrega no momento.", 409);
     }
 
     if (input.fulfillmentType === "pickup" && !settings.acceptsPickup) {
-      throw new ApiError("A loja não está aceitando pedidos para retirada no momento.", 409);
+      throw new ApiError("A loja nÃ£o estÃ¡ aceitando pedidos para retirada no momento.", 409);
     }
 
     if (subtotal < settings.minimumOrderValue) {
       throw new ApiError(
-        `O pedido mínimo é ${Intl.NumberFormat("pt-BR", {
+        `O pedido mÃ­nimo Ã© ${Intl.NumberFormat("pt-BR", {
           style: "currency",
           currency: "BRL",
         }).format(settings.minimumOrderValue)}.`,
@@ -189,7 +203,7 @@ export const orderService = {
     };
 
     if (input.fulfillmentType === "delivery" && customer.customerAddress.length < 5) {
-      throw new ApiError("Informe um endereço válido para entrega.", 409);
+      throw new ApiError("Informe um endereÃ§o vÃ¡lido para entrega.", 409);
     }
 
     const message = buildWhatsappMessage({
@@ -204,10 +218,30 @@ export const orderService = {
       settings.whatsappNumber || process.env.NEXT_PUBLIC_WHATSAPP_FALLBACK_NUMBER || "";
 
     if (!whatsappNumber) {
-      throw new ApiError("O número de WhatsApp da loja ainda não foi configurado.", 409);
+      throw new ApiError("O nÃºmero de WhatsApp da loja ainda nÃ£o foi configurado.", 409);
     }
 
     const order = await prisma.$transaction(async (tx) => {
+      for (const item of normalizedItems) {
+        const reservedInventory = await tx.inventory.updateMany({
+          where: {
+            productId: item.productId,
+            quantity: {
+              gte: item.quantity,
+            },
+          },
+          data: {
+            quantity: {
+              decrement: item.quantity,
+            },
+          },
+        });
+
+        if (reservedInventory.count !== 1) {
+          throw new ApiError(`Estoque insuficiente para "${item.productName}".`, 409);
+        }
+      }
+
       return tx.order.create({
         data: {
           fulfillmentType: customer.fulfillmentType,

@@ -1,9 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { decimalToNumber, toDecimal } from "@/lib/currency";
 import type { UpdateStoreSettingsInput } from "@/lib/validations";
-import type { StoreSettingsDTO } from "@/types/order";
+import type { AdminStoreSettingsDTO, StoreSettingsDTO } from "@/types/order";
 
-const mapStoreSettings = (settings: {
+const mapAdminStoreSettings = (settings: {
   id: number;
   storeName: string;
   whatsappNumber: string;
@@ -13,7 +13,7 @@ const mapStoreSettings = (settings: {
   acceptsDelivery: boolean;
   createdAt: Date;
   updatedAt: Date;
-}): StoreSettingsDTO => ({
+}): AdminStoreSettingsDTO => ({
   id: settings.id,
   storeName: settings.storeName,
   whatsappNumber: settings.whatsappNumber,
@@ -25,9 +25,20 @@ const mapStoreSettings = (settings: {
   updatedAt: settings.updatedAt.toISOString(),
 });
 
-const defaultSettings: StoreSettingsDTO = {
+const toPublicStoreSettings = (settings: AdminStoreSettingsDTO): StoreSettingsDTO => ({
+  id: settings.id,
+  storeName: settings.storeName,
+  deliveryFee: settings.deliveryFee,
+  minimumOrderValue: settings.minimumOrderValue,
+  acceptsPickup: settings.acceptsPickup,
+  acceptsDelivery: settings.acceptsDelivery,
+  createdAt: settings.createdAt,
+  updatedAt: settings.updatedAt,
+});
+
+const defaultAdminSettings: AdminStoreSettingsDTO = {
   id: 1,
-  storeName: "Catálogo de Mercado",
+  storeName: "CatÃ¡logo de Mercado",
   whatsappNumber: process.env.NEXT_PUBLIC_WHATSAPP_FALLBACK_NUMBER || "",
   deliveryFee: 0,
   minimumOrderValue: 0,
@@ -42,19 +53,30 @@ const loadStoreSettings = async () => {
 };
 
 export const storeService = {
-  async get() {
+  async getPublic() {
     try {
       const settings = await loadStoreSettings();
-      return settings ? mapStoreSettings(settings) : defaultSettings;
+      const adminSettings = settings ? mapAdminStoreSettings(settings) : defaultAdminSettings;
+      return toPublicStoreSettings(adminSettings);
     } catch (error) {
       console.error("Failed to load store settings, using defaults instead.", error);
-      return defaultSettings;
+      return toPublicStoreSettings(defaultAdminSettings);
     }
   },
 
-  async getRequired() {
+  async getAdmin() {
+    try {
+      const settings = await loadStoreSettings();
+      return settings ? mapAdminStoreSettings(settings) : defaultAdminSettings;
+    } catch (error) {
+      console.error("Failed to load admin store settings, using defaults instead.", error);
+      return defaultAdminSettings;
+    }
+  },
+
+  async getOrderSettings() {
     const settings = await loadStoreSettings();
-    return settings ? mapStoreSettings(settings) : defaultSettings;
+    return settings ? mapAdminStoreSettings(settings) : defaultAdminSettings;
   },
 
   async update(input: UpdateStoreSettingsInput) {
@@ -79,6 +101,6 @@ export const storeService = {
       },
     });
 
-    return mapStoreSettings(settings);
+    return mapAdminStoreSettings(settings);
   },
 };

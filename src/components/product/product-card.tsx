@@ -2,9 +2,9 @@ import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { formatCurrencyBRL } from "@/lib/currency";
-import type { ProductListItem } from "@/types/product";
+import type { PublicProductListItem } from "@/types/product";
 
-export function ProductCard({ product }: { product: ProductListItem }) {
+export function ProductCard({ product }: { product: PublicProductListItem }) {
   return (
     <Card className="bp-product-card h-full p-0">
       <div

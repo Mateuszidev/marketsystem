@@ -3,14 +3,56 @@ import { slugify } from "@/lib/slug";
 import { ApiError } from "@/lib/errors";
 import { decimalToNumber, toDecimal } from "@/lib/currency";
 import type { CreateProductInput, UpdateProductInput } from "@/lib/validations";
-import type { ProductFilters, ProductListItem } from "@/types/product";
+import type { AdminProductListItem, ProductFilters, PublicProductListItem } from "@/types/product";
 
-const productInclude = {
+const publicProductSelect = {
+  id: true,
+  name: true,
+  slug: true,
+  description: true,
+  price: true,
+  imageUrl: true,
+  categoryId: true,
+  category: {
+    select: {
+      name: true,
+    },
+  },
+  inventory: {
+    select: {
+      quantity: true,
+    },
+  },
+} as const;
+
+const adminProductInclude = {
   category: true,
   inventory: true,
 } as const;
 
-const mapProduct = (product: {
+const mapPublicProduct = (product: {
+  id: number;
+  name: string;
+  slug: string;
+  description: string | null;
+  price: unknown;
+  imageUrl: string | null;
+  categoryId: number;
+  category: { name: string };
+  inventory: { quantity: number } | null;
+}): PublicProductListItem => ({
+  id: product.id,
+  name: product.name,
+  slug: product.slug,
+  description: product.description,
+  price: decimalToNumber(product.price as never),
+  imageUrl: product.imageUrl,
+  categoryId: product.categoryId,
+  categoryName: product.category.name,
+  available: (product.inventory?.quantity ?? 0) > 0,
+});
+
+const mapAdminProduct = (product: {
   id: number;
   name: string;
   slug: string;
@@ -24,22 +66,25 @@ const mapProduct = (product: {
   inventory: { quantity: number; minQuantity: number } | null;
   createdAt: Date;
   updatedAt: Date;
-}): ProductListItem => ({
-  id: product.id,
-  name: product.name,
-  slug: product.slug,
-  description: product.description,
-  price: decimalToNumber(product.price as never),
-  imageUrl: product.imageUrl,
+}): AdminProductListItem => ({
+  ...mapPublicProduct(product),
   sku: product.sku,
   active: product.active,
-  categoryId: product.categoryId,
-  categoryName: product.category.name,
   inventoryQuantity: product.inventory?.quantity ?? 0,
   minQuantity: product.inventory?.minQuantity ?? 0,
-  available: (product.inventory?.quantity ?? 0) > 0,
   createdAt: product.createdAt.toISOString(),
   updatedAt: product.updatedAt.toISOString(),
+});
+
+const buildWhere = (filters: ProductFilters) => ({
+  active: filters.includeInactive ? undefined : true,
+  name: filters.search
+    ? {
+        contains: filters.search,
+        mode: "insensitive" as const,
+      }
+    : undefined,
+  category: filters.categorySlug ? { slug: filters.categorySlug } : undefined,
 });
 
 const ensureUniqueFields = async (slug: string, sku: string, excludeId?: number) => {
@@ -49,45 +94,46 @@ const ensureUniqueFields = async (slug: string, sku: string, excludeId?: number)
   ]);
 
   if (bySlug && bySlug.id !== excludeId) {
-    throw new ApiError("Já existe um produto com este slug.", 409);
+    throw new ApiError("JÃ¡ existe um produto com este slug.", 409);
   }
 
   if (bySku && bySku.id !== excludeId) {
-    throw new ApiError("Já existe um produto com este SKU.", 409);
+    throw new ApiError("JÃ¡ existe um produto com este SKU.", 409);
   }
 };
 
 export const productService = {
-  async list(filters: ProductFilters = {}) {
+  async listPublic(filters: ProductFilters = {}) {
     const products = await prisma.product.findMany({
-      where: {
-        active: filters.includeInactive ? undefined : true,
-        name: filters.search
-          ? {
-              contains: filters.search,
-              mode: "insensitive",
-            }
-          : undefined,
-        category: filters.categorySlug ? { slug: filters.categorySlug } : undefined,
-      },
-      include: productInclude,
+      where: buildWhere(filters),
+      select: publicProductSelect,
+      orderBy: { name: "asc" },
+    });
+
+    return products.map(mapPublicProduct);
+  },
+
+  async listAdmin(filters: ProductFilters = {}) {
+    const products = await prisma.product.findMany({
+      where: buildWhere(filters),
+      include: adminProductInclude,
       orderBy: [{ active: "desc" }, { name: "asc" }],
     });
 
-    return products.map(mapProduct);
+    return products.map(mapAdminProduct);
   },
 
-  async getById(id: number) {
+  async getAdminById(id: number) {
     const product = await prisma.product.findUnique({
       where: { id },
-      include: productInclude,
+      include: adminProductInclude,
     });
 
     if (!product) {
-      throw new ApiError("Produto não encontrado.", 404);
+      throw new ApiError("Produto nÃ£o encontrado.", 404);
     }
 
-    return mapProduct(product);
+    return mapAdminProduct(product);
   },
 
   async create(input: CreateProductInput) {
@@ -97,7 +143,7 @@ export const productService = {
     const category = await prisma.category.findUnique({ where: { id: input.categoryId } });
 
     if (!category) {
-      throw new ApiError("Categoria não encontrada.", 404);
+      throw new ApiError("Categoria nÃ£o encontrada.", 404);
     }
 
     const product = await prisma.product.create({
@@ -117,21 +163,21 @@ export const productService = {
           },
         },
       },
-      include: productInclude,
+      include: adminProductInclude,
     });
 
-    return mapProduct(product);
+    return mapAdminProduct(product);
   },
 
   async update(id: number, input: UpdateProductInput) {
-    await this.getById(id);
+    await this.getAdminById(id);
     const slug = slugify(input.slug?.trim() || input.name);
     await ensureUniqueFields(slug, input.sku.trim(), id);
 
     const category = await prisma.category.findUnique({ where: { id: input.categoryId } });
 
     if (!category) {
-      throw new ApiError("Categoria não encontrada.", 404);
+      throw new ApiError("Categoria nÃ£o encontrada.", 404);
     }
 
     const product = await prisma.product.update({
@@ -158,21 +204,21 @@ export const productService = {
           },
         },
       },
-      include: productInclude,
+      include: adminProductInclude,
     });
 
-    return mapProduct(product);
+    return mapAdminProduct(product);
   },
 
   async deactivate(id: number) {
-    await this.getById(id);
+    await this.getAdminById(id);
 
     const product = await prisma.product.update({
       where: { id },
       data: { active: false },
-      include: productInclude,
+      include: adminProductInclude,
     });
 
-    return mapProduct(product);
+    return mapAdminProduct(product);
   },
 };

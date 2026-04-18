@@ -12,10 +12,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { getErrorMessage } from "@/lib/errors";
 import { createProductSchema, type CreateProductInput } from "@/lib/validations";
 import type { CategoryListItem } from "@/types/category";
-import type { ProductListItem } from "@/types/product";
+import type { AdminProductListItem } from "@/types/product";
 
 type ProductFormProps = {
-  product?: ProductListItem;
+  product?: AdminProductListItem;
   categories: CategoryListItem[];
 };
 

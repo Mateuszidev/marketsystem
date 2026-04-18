@@ -9,9 +9,9 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { getErrorMessage } from "@/lib/errors";
 import { updateStoreSettingsSchema, type UpdateStoreSettingsInput } from "@/lib/validations";
-import type { StoreSettingsDTO } from "@/types/order";
+import type { AdminStoreSettingsDTO } from "@/types/order";
 
-export function StoreSettingsForm({ settings }: { settings: StoreSettingsDTO }) {
+export function StoreSettingsForm({ settings }: { settings: AdminStoreSettingsDTO }) {
   const router = useRouter();
   const [submitError, setSubmitError] = useState("");
   const form = useForm<UpdateStoreSettingsInput>({

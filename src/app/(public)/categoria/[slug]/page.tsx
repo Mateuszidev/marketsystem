@@ -16,7 +16,7 @@ export default async function CategoriaPage({ params }: CategoriaPageProps) {
     notFound();
   }
 
-  const products = await productService.list({ categorySlug: slug });
+  const products = await productService.listPublic({ categorySlug: slug });
 
   return (
     <div className="space-y-6">

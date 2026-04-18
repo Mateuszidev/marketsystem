@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/store/cart-store";
-import type { ProductListItem } from "@/types/product";
+import type { PublicProductListItem } from "@/types/product";
 
-export function AddToCartButton({ product }: { product: ProductListItem }) {
+export function AddToCartButton({ product }: { product: PublicProductListItem }) {
   const addItem = useCartStore((state) => state.addItem);
   const [added, setAdded] = useState(false);
 

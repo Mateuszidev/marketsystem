@@ -5,7 +5,7 @@ import { storeService } from "@/services/store-service";
 
 export async function GET() {
   try {
-    return jsonSuccess(await storeService.get());
+    return jsonSuccess(await storeService.getPublic());
   } catch (error) {
     return handleRouteError(error);
   }

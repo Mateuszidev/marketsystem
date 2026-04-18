@@ -6,7 +6,7 @@ import { storeService } from "@/services/store-service";
 export const dynamic = "force-dynamic";
 
 export default async function PublicLayout({ children }: { children: ReactNode }) {
-  const settings = await storeService.get();
+  const settings = await storeService.getPublic();
 
   return (
     <div className="bp-page bp-shell">

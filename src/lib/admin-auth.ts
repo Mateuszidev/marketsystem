@@ -12,6 +12,9 @@ import {
 } from "@/lib/admin-auth-session";
 
 const SESSION_DURATION_SECONDS = 60 * 60 * 12;
+const MIN_ADMIN_PASSWORD_LENGTH = 12;
+const MIN_SESSION_SECRET_LENGTH = 32;
+const INSECURE_ADMIN_VALUES = new Set(["admin", "123456", "password", "sua-senha", "changeme"]);
 
 const safeCompare = (left: string, right: string) => {
   const leftBuffer = Buffer.from(left);
@@ -35,6 +38,37 @@ const getAdminCredentials = () => {
   return { username, password };
 };
 
+const hasStrongAdminPassword = (value: string) =>
+  value.length >= MIN_ADMIN_PASSWORD_LENGTH &&
+  /[a-z]/i.test(value) &&
+  /\d/.test(value) &&
+  /[^a-z0-9]/i.test(value) &&
+  !INSECURE_ADMIN_VALUES.has(value.toLowerCase());
+
+const hasStrongSessionSecret = (value: string) =>
+  value.length >= MIN_SESSION_SECRET_LENGTH && !INSECURE_ADMIN_VALUES.has(value.toLowerCase());
+
+const assertSecureAdminConfig = () => {
+  const { password } = getAdminCredentials();
+  const sessionSecret = process.env.ADMIN_SESSION_SECRET;
+
+  if (!sessionSecret) {
+    throw new Error("ADMIN_SESSION_SECRET nao configurado.");
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    return;
+  }
+
+  if (!hasStrongAdminPassword(password)) {
+    throw new Error("ADMIN_PASSWORD precisa ter pelo menos 12 caracteres e incluir letras, numeros e simbolos.");
+  }
+
+  if (!hasStrongSessionSecret(sessionSecret)) {
+    throw new Error("ADMIN_SESSION_SECRET precisa ter pelo menos 32 caracteres e nao pode usar valores previsiveis.");
+  }
+};
+
 export const sanitizeAdminRedirect = (value?: string | null) => {
   if (!value || !value.startsWith("/admin")) {
     return "/admin";
@@ -48,6 +82,7 @@ export const sanitizeAdminRedirect = (value?: string | null) => {
 };
 
 export const getAdminSession = async (): Promise<AdminSession | null> => {
+  assertSecureAdminConfig();
   const cookieStore = await cookies();
   const token = cookieStore.get(ADMIN_SESSION_COOKIE)?.value;
 
@@ -75,12 +110,14 @@ export const requireAdminApiSession = async () => {
 };
 
 export const isValidAdminCredentials = (username: string, password: string) => {
+  assertSecureAdminConfig();
   const credentials = getAdminCredentials();
 
   return safeCompare(username, credentials.username) && safeCompare(password, credentials.password);
 };
 
 export const createAdminSession = async (username: string) => {
+  assertSecureAdminConfig();
   const cookieStore = await cookies();
   const token = createAdminSessionToken(username);
 

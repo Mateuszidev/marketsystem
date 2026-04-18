@@ -14,7 +14,7 @@ export default async function ProdutosPage({ searchParams }: ProdutosPageProps) 
   const filters = await searchParams;
   const [categories, products] = await Promise.all([
     categoryService.list(),
-    productService.list({
+    productService.listPublic({
       search: filters.busca || "",
       categorySlug: filters.categoria || "",
     }),

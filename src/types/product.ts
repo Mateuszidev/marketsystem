@@ -1,17 +1,20 @@
-export type ProductListItem = {
+export type PublicProductListItem = {
   id: number;
   name: string;
   slug: string;
   description: string | null;
   price: number;
   imageUrl: string | null;
-  sku: string;
-  active: boolean;
   categoryId: number;
   categoryName: string;
+  available: boolean;
+};
+
+export type AdminProductListItem = PublicProductListItem & {
+  sku: string;
+  active: boolean;
   inventoryQuantity: number;
   minQuantity: number;
-  available: boolean;
   createdAt: string;
   updatedAt: string;
 };

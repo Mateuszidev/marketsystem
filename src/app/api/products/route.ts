@@ -1,4 +1,4 @@
-import { requireAdminApiSession } from "@/lib/admin-auth";
+import { getAdminSession, requireAdminApiSession } from "@/lib/admin-auth";
 import { handleRouteError, jsonSuccess } from "@/lib/errors";
 import { createProductSchema } from "@/lib/validations";
 import { productService } from "@/services/product-service";
@@ -8,10 +8,11 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const search = url.searchParams.get("search") || "";
     const category = url.searchParams.get("category") || "";
-    const includeInactive = url.searchParams.get("includeInactive") === "true";
+    const includeInactive =
+      url.searchParams.get("includeInactive") === "true" && Boolean(await getAdminSession());
 
     return jsonSuccess(
-      await productService.list({
+      await productService.listPublic({
         search,
         categorySlug: category,
         includeInactive,

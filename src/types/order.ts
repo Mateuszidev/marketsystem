@@ -34,11 +34,14 @@ export type OrderDetail = OrderSummary & {
 export type StoreSettingsDTO = {
   id: number;
   storeName: string;
-  whatsappNumber: string;
   deliveryFee: number;
   minimumOrderValue: number;
   acceptsPickup: boolean;
   acceptsDelivery: boolean;
   createdAt: string;
   updatedAt: string;
+};
+
+export type AdminStoreSettingsDTO = StoreSettingsDTO & {
+  whatsappNumber: string;
 };

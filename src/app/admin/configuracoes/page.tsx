@@ -2,7 +2,7 @@ import { StoreSettingsForm } from "@/components/admin/store-settings-form";
 import { storeService } from "@/services/store-service";
 
 export default async function ConfiguracoesPage() {
-  const settings = await storeService.get();
+  const settings = await storeService.getAdmin();
 
   return (
     <div className="space-y-6">
