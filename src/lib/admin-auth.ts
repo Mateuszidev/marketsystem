@@ -7,6 +7,7 @@ import { ApiError } from "@/lib/errors";
 import {
   ADMIN_SESSION_COOKIE,
   createAdminSessionToken,
+  getAdminSessionSecretConfig,
   verifyAdminSessionToken,
   type AdminSession,
 } from "@/lib/admin-auth-session";
@@ -50,11 +51,7 @@ const hasStrongSessionSecret = (value: string) =>
 
 const assertSecureAdminConfig = () => {
   const { password } = getAdminCredentials();
-  const sessionSecret = process.env.ADMIN_SESSION_SECRET;
-
-  if (!sessionSecret) {
-    throw new Error("ADMIN_SESSION_SECRET nao configurado.");
-  }
+  const sessionSecret = getAdminSessionSecretConfig().value;
 
   if (process.env.NODE_ENV !== "production") {
     return;
