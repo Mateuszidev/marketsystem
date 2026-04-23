@@ -30,7 +30,7 @@ export function AdminLoginForm({ from }: AdminLoginFormProps) {
           <label htmlFor="username" className="mb-2 block text-sm font-medium">
             Usuario
           </label>
-          <Input id="username" name="username" autoComplete="username" placeholder="admin" />
+          <Input id="username" name="username" autoComplete="username" />
           <p className="mt-1 min-h-5 text-sm text-rose-600">{state.fieldErrors?.username?.[0] || ""}</p>
         </div>
 

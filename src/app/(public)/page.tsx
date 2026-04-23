@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ProductCard } from "@/components/product/product-card";
@@ -18,7 +17,6 @@ export default async function HomePage() {
     <div className="space-y-10">
       <section className="bp-hero">
         <div className="bp-hero-card">
-          <Badge className="badge">pedido rapido no whatsapp</Badge>
           <h1 className="bp-hero-title">
             Ofertas fresquinhas do <span>{settings.storeName}</span>
           </h1>
@@ -28,9 +26,6 @@ export default async function HomePage() {
           <div className="bp-hero-actions">
             <Link href="/produtos" className="btn btn--primary">
               Ver catalogo
-            </Link>
-            <Link href="/admin" className="btn btn--outline">
-              Abrir admin
             </Link>
           </div>
         </div>
