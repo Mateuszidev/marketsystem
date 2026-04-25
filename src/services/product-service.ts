@@ -5,6 +5,10 @@ import { decimalToNumber, toDecimal } from "@/lib/currency";
 import type { CreateProductInput, UpdateProductInput } from "@/lib/validations";
 import type { AdminProductListItem, ProductFilters, PublicProductListItem } from "@/types/product";
 
+const DEFAULT_PUBLIC_PRODUCT_LIMIT = 48;
+const DEFAULT_ADMIN_PRODUCT_LIMIT = 100;
+const MAX_PRODUCT_LIMIT = 100;
+
 const publicProductSelect = {
   id: true,
   name: true,
@@ -87,6 +91,16 @@ const buildWhere = (filters: ProductFilters) => ({
   category: filters.categorySlug ? { slug: filters.categorySlug } : undefined,
 });
 
+const getPagination = (filters: ProductFilters, defaultLimit: number) => {
+  const limit = Math.min(Math.max(filters.limit ?? defaultLimit, 1), MAX_PRODUCT_LIMIT);
+  const page = Math.max(filters.page ?? 1, 1);
+
+  return {
+    take: limit,
+    skip: (page - 1) * limit,
+  };
+};
+
 const ensureUniqueFields = async (slug: string, sku: string, excludeId?: number) => {
   const [bySlug, bySku] = await Promise.all([
     prisma.product.findUnique({ where: { slug } }),
@@ -108,6 +122,7 @@ export const productService = {
       where: buildWhere(filters),
       select: publicProductSelect,
       orderBy: { name: "asc" },
+      ...getPagination(filters, DEFAULT_PUBLIC_PRODUCT_LIMIT),
     });
 
     return products.map(mapPublicProduct);
@@ -118,6 +133,7 @@ export const productService = {
       where: buildWhere(filters),
       include: adminProductInclude,
       orderBy: [{ active: "desc" }, { name: "asc" }],
+      ...getPagination(filters, DEFAULT_ADMIN_PRODUCT_LIMIT),
     });
 
     return products.map(mapAdminProduct);

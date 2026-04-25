@@ -44,7 +44,3 @@ MVP de um sistema de pedidos de mercado com:
 - Alteração manual de status
 - Configurações da loja
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 7297a9566d04b9bda3e4e44d933ee83d3d31a0aa

@@ -23,4 +23,6 @@ export type ProductFilters = {
   categorySlug?: string;
   search?: string;
   includeInactive?: boolean;
+  limit?: number;
+  page?: number;
 };

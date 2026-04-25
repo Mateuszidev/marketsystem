@@ -7,6 +7,15 @@ import type { CreateOrderInput, UpdateOrderStatusInput } from "@/lib/validations
 import type { OrderDetail, OrderItemSnapshotForMessage, OrderSummary } from "@/types/order";
 import { storeService } from "@/services/store-service";
 
+const DEFAULT_ORDER_LIMIT = 50;
+const MAX_ORDER_LIMIT = 100;
+
+type OrderListOptions = {
+  status?: OrderStatus;
+  limit?: number;
+  page?: number;
+};
+
 const mapOrderSummary = (order: {
   id: number;
   fulfillmentType: FulfillmentType;
@@ -94,15 +103,19 @@ const groupOrderItems = (items: CreateOrderInput["items"]) => {
 };
 
 export const orderService = {
-  async list(status?: OrderStatus) {
+  async list(options: OrderListOptions = {}) {
+    const limit = Math.min(Math.max(options.limit ?? DEFAULT_ORDER_LIMIT, 1), MAX_ORDER_LIMIT);
+    const page = Math.max(options.page ?? 1, 1);
     const orders = await prisma.order.findMany({
-      where: status ? { status } : undefined,
+      where: options.status ? { status: options.status } : undefined,
       include: {
         items: {
           select: { quantity: true },
         },
       },
       orderBy: { createdAt: "desc" },
+      take: limit,
+      skip: (page - 1) * limit,
     });
 
     return orders.map(mapOrderSummary);

@@ -11,7 +11,7 @@ type AdminPedidosPageProps = {
 
 export default async function AdminPedidosPage({ searchParams }: AdminPedidosPageProps) {
   const { status } = await searchParams;
-  const orders = await orderService.list(status);
+  const orders = await orderService.list({ status });
 
   return (
     <div className="space-y-6">
