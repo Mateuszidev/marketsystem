@@ -4,11 +4,10 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { ProductCard } from "@/components/product/product-card";
 import { categoryService } from "@/services/category-service";
 import { productService } from "@/services/product-service";
-import { storeService } from "@/services/store-service";
+import { MARKET_DISPLAY_NAME } from "@/lib/brand";
 
 export default async function HomePage() {
-  const [settings, categories, products] = await Promise.all([
-    storeService.getPublic(),
+  const [categories, products] = await Promise.all([
     categoryService.list(),
     productService.listPublic(),
   ]);
@@ -18,7 +17,7 @@ export default async function HomePage() {
       <section className="bp-hero">
         <div className="bp-hero-card">
           <h1 className="bp-hero-title">
-            Ofertas fresquinhas do <span>{settings.storeName}</span>
+            Ofertas fresquinhas <span>{MARKET_DISPLAY_NAME}</span>
           </h1>
           <p className="bp-hero-desc">
             Monte seu carrinho como num encarte moderno, acompanhe os destaques da loja e finalize o pedido em poucos toques.
