@@ -313,7 +313,7 @@ h3 { font-size: 1.25rem; }
 .card p { color: #52627e; }
 
 .card .bp-cart-product-name {
-  color: var(--white);
+  color: var(--orange);
   font-weight: 900;
 }
 
