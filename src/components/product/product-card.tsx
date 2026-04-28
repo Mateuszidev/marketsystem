@@ -11,15 +11,15 @@ export function ProductCard({ product }: { product: PublicProductListItem }) {
         className="bp-product-img"
         style={{
           background: product.imageUrl
-            ? "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.02) 100%)"
-            : "linear-gradient(135deg, rgba(247,194,0,0.2) 0%, rgba(217,43,43,0.08) 100%)",
+            ? "var(--img-bg)"
+            : "linear-gradient(135deg, rgba(255,111,0,0.16) 0%, rgba(26,41,96,0.95) 100%)",
         }}
       >
         {product.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
+          <img src={product.imageUrl} alt={product.name} className="bp-product-image h-full w-full object-contain" />
         ) : (
-          <div className="text-sm font-bold uppercase tracking-[0.18em] text-[var(--color-brand)]">Sem imagem</div>
+          <div className="text-sm font-bold uppercase tracking-[0.18em] text-[var(--orange2)]">Sem imagem</div>
         )}
         {!product.available ? <span className="bp-product-tag">Sem estoque</span> : <span className="bp-product-tag">Destaque</span>}
       </div>
@@ -31,7 +31,7 @@ export function ProductCard({ product }: { product: PublicProductListItem }) {
           </div>
           {product.available ? <Badge className="badge badge--yellow">Disponivel</Badge> : null}
         </div>
-        {product.description ? <p className="mt-3 text-sm leading-6 text-stone-600">{product.description}</p> : null}
+        {product.description ? <p className="bp-product-desc mt-3 text-sm leading-6">{product.description}</p> : null}
         <div className="bp-product-footer mt-auto">
           <p className="bp-product-price">{formatCurrencyBRL(product.price)}</p>
           <AddToCartButton product={product} />

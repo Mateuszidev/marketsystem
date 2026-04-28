@@ -14,13 +14,13 @@ export function SiteHeader({ storeName }: SiteHeaderProps) {
     <header className="bp-header">
       <div className="bp-container flex items-center justify-between gap-4">
         <Link href="/" className="bp-logo" aria-label={`Ir para a home da loja ${displayName}`}>
-          <div className="bp-logo-icon overflow-hidden rounded-full border-2 border-white/35 bg-white shadow-[inset_0_1px_0_rgba(255,255,255,0.22)]">
+          <div className="bp-logo-icon rounded-xl border-2 border-white/35 bg-white p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.22)]">
             <Image
               src="/images/logo.png"
               alt={`Logo da loja ${displayName}`}
               width={46}
               height={46}
-              className="h-full w-full object-cover"
+              className="h-full w-full object-contain"
               priority
             />
           </div>

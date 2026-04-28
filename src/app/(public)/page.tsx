@@ -6,21 +6,52 @@ import { categoryService } from "@/services/category-service";
 import { productService } from "@/services/product-service";
 import { MARKET_DISPLAY_NAME } from "@/lib/brand";
 
+const featuredCategoryOrder = [
+  "Pods Descartaveis",
+  "Ignite",
+  "Elf Bar",
+  "Juice",
+  "Recarregaveis",
+  "Snus",
+  "Coils",
+  "Pods / Sistemas",
+];
+
+const normalizeCategoryName = (name: string) =>
+  name
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+
+const featuredCategoryOrderIndex = new Map(
+  featuredCategoryOrder.map((name, index) => [normalizeCategoryName(name), index]),
+);
+
 export default async function HomePage() {
   const [categories, products] = await Promise.all([
     categoryService.list(),
     productService.listPublic(),
   ]);
+  const featuredCategories = [...categories].sort((a, b) => {
+    const aIndex = featuredCategoryOrderIndex.get(normalizeCategoryName(a.name)) ?? Number.MAX_SAFE_INTEGER;
+    const bIndex = featuredCategoryOrderIndex.get(normalizeCategoryName(b.name)) ?? Number.MAX_SAFE_INTEGER;
+
+    if (aIndex !== bIndex) {
+      return aIndex - bIndex;
+    }
+
+    return a.name.localeCompare(b.name, "pt-BR");
+  });
 
   return (
     <div className="space-y-10">
       <section className="bp-hero">
         <div className="bp-hero-card">
           <h1 className="bp-hero-title">
-            Ofertas fresquinhas <span>{MARKET_DISPLAY_NAME}</span>
+            <span>{MARKET_DISPLAY_NAME}</span>
           </h1>
           <p className="bp-hero-desc">
-            Monte seu carrinho como num encarte moderno, acompanhe os destaques da loja e finalize o pedido em poucos toques.
+            As melhores ofertas de Pods & Vapes em um só lugar! Variedade premium, atendimento rápido e entrega garantida
           </p>
           <div className="bp-hero-actions">
             <Link href="/produtos" className="btn btn--primary">
@@ -32,7 +63,7 @@ export default async function HomePage() {
         <Card className="bp-cat-card">
           <p className="bp-section-label">Categorias em destaque</p>
           <div className="bp-cat-pills">
-            {categories.map((category) => (
+            {featuredCategories.map((category) => (
               <Link key={category.id} href={`/categoria/${category.slug}`} className="bp-cat-pill">
                 {category.name}
               </Link>
@@ -59,7 +90,7 @@ export default async function HomePage() {
         <div className="bp-promo-banner">
           <div>
             <p className="bp-promo-title">Gostou, clicou, pediu.</p>
-            <p className="bp-promo-sub">Experiencia pensada para o seu melhor conforto e agilidade!</p>
+            <p className="bp-promo-sub">Experiência pensada para o seu melhor conforto e agilidade!</p>
           </div>
           <Link href="/produtos" className="btn btn--ghost">
             Explorar

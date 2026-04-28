@@ -26,7 +26,7 @@ export function CartItems() {
         <p className="mt-2 text-sm text-stone-600">Adicione produtos no catálogo para continuar.</p>
         <Link
           href="/produtos"
-          className="mt-6 inline-flex rounded-2xl bg-[var(--color-brand)] px-4 py-2 text-sm font-semibold text-white"
+          className="bp-cart-checkout-link mt-6 inline-flex rounded-2xl px-4 py-2 text-sm font-semibold"
         >
           Ver produtos
         </Link>
@@ -40,8 +40,8 @@ export function CartItems() {
         {items.map((item) => (
           <Card key={item.productId} className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-[var(--color-text)]">{item.name}</h3>
-              <p className="text-sm text-stone-500">{formatCurrencyBRL(item.price)} por unidade</p>
+              <h3 className="bp-cart-product-name text-lg font-semibold">{item.name}</h3>
+              <p className="bp-cart-product-price text-sm">{formatCurrencyBRL(item.price)} por unidade</p>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="secondary" onClick={() => decreaseItem(item.productId)}>
@@ -60,11 +60,11 @@ export function CartItems() {
       </div>
       <Card className="h-fit">
         <p className="text-sm text-stone-500">Subtotal estimado</p>
-        <p className="mt-2 text-3xl font-black tracking-tight text-[var(--color-text)]">{formatCurrencyBRL(total)}</p>
+        <p className="bp-cart-total mt-2 text-3xl font-black tracking-tight">{formatCurrencyBRL(total)}</p>
         <p className="mt-3 text-sm text-stone-500">O valor final será recalculado no backend antes de gerar o pedido.</p>
         <Link
           href="/finalizar"
-          className="mt-6 inline-flex w-full items-center justify-center rounded-2xl bg-[var(--color-brand)] px-4 py-3 text-sm font-semibold text-white"
+          className="bp-cart-checkout-link mt-6 inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-semibold"
         >
           Ir para finalização
         </Link>

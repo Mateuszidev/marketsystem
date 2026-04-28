@@ -1,1 +1,1 @@
-export const MARKET_DISPLAY_NAME = "Mercado BonPrix Da Amendoeira";
+export const MARKET_DISPLAY_NAME = "PodExpress";
