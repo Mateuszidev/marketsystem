@@ -20,10 +20,11 @@ export const buildWhatsappMessage = ({
   const lines = [
     "Olá! Gostaria de fazer este pedido:",
     "",
-    ...items.map(
-      (item) =>
-        `- ${item.quantity}x ${item.productName}  ${formatCurrencyBRL(item.subtotal)} (${formatCurrencyBRL(item.unitPrice)} cada)`,
-    ),
+    ...items.map((item) => {
+      const flavorLine = item.flavorName ? `\n  Sabor: ${item.flavorName}` : "";
+
+      return `- ${item.quantity}x ${item.productName}${flavorLine}\n  ${formatCurrencyBRL(item.subtotal)} (${formatCurrencyBRL(item.unitPrice)} cada)`;
+    }),
     "",
     `Subtotal: ${formatCurrencyBRL(subtotal)}`,
     `Taxa de entrega: ${formatCurrencyBRL(deliveryFee)}`,

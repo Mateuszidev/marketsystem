@@ -11,7 +11,8 @@ export async function PUT(request: Request, { params }: RouteContext) {
   try {
     await requireAdminApiSession();
     const { id } = await params;
-    const payload = updateProductSchema.parse(await request.json());
+    const body = await request.json();
+    const payload = updateProductSchema.parse({ flavors: [], ...body });
     return jsonSuccess(await productService.update(Number(id), payload));
   } catch (error) {
     return handleRouteError(error);

@@ -4,6 +4,8 @@ export type FulfillmentType = "delivery" | "pickup";
 export type OrderItemSnapshotForMessage = {
   productId: number;
   productName: string;
+  flavorId?: number | null;
+  flavorName?: string | null;
   unitPrice: number;
   quantity: number;
   subtotal: number;

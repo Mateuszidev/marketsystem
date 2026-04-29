@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { formatCurrencyBRL } from "@/lib/currency";
-import { useCartStore } from "@/store/cart-store";
+import { getCartItemKey, useCartStore } from "@/store/cart-store";
 
 export function CartItems() {
   const { items, subtotal, increaseItem, decreaseItem, removeItem, hasHydrated } = useCartStore();
@@ -37,26 +37,31 @@ export function CartItems() {
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
       <div className="space-y-4">
-        {items.map((item) => (
-          <Card key={item.productId} className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        {items.map((item) => {
+          const itemKey = getCartItemKey(item);
+
+          return (
+          <Card key={itemKey} className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h3 className="bp-cart-product-name text-lg font-semibold">{item.name}</h3>
+              {item.flavorName ? <p className="text-sm font-medium text-stone-600">Sabor: {item.flavorName}</p> : null}
               <p className="bp-cart-product-price text-sm">{formatCurrencyBRL(item.price)} por unidade</p>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="secondary" onClick={() => decreaseItem(item.productId)}>
+              <Button variant="secondary" onClick={() => decreaseItem(itemKey)}>
                 -
               </Button>
               <span className="w-10 text-center text-sm font-semibold">{item.quantity}</span>
-              <Button variant="secondary" onClick={() => increaseItem(item.productId)}>
+              <Button variant="secondary" onClick={() => increaseItem(itemKey)}>
                 +
               </Button>
-              <Button variant="ghost" onClick={() => removeItem(item.productId)}>
+              <Button variant="ghost" onClick={() => removeItem(itemKey)}>
                 Remover
               </Button>
             </div>
           </Card>
-        ))}
+          );
+        })}
       </div>
       <Card className="h-fit">
         <p className="text-sm text-stone-500">Subtotal estimado</p>

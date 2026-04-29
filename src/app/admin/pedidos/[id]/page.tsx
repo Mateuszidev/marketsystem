@@ -26,6 +26,7 @@ export default async function PedidoDetailPage({ params }: PedidoDetailPageProps
               <div key={`${item.productId}-${item.productName}`} className="flex items-center justify-between border-b border-black/5 pb-3">
                 <div>
                   <p className="font-medium">{item.productName}</p>
+                  {item.flavorName ? <p className="text-sm text-stone-500">Sabor: {item.flavorName}</p> : null}
                   <p className="text-sm text-stone-500">
                     {item.quantity} x {formatCurrencyBRL(item.unitPrice)}
                   </p>

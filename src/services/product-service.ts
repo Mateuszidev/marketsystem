@@ -27,11 +27,29 @@ const publicProductSelect = {
       quantity: true,
     },
   },
+  flavors: {
+    where: {
+      active: true,
+    },
+    select: {
+      id: true,
+      name: true,
+      active: true,
+    },
+    orderBy: {
+      name: "asc" as const,
+    },
+  },
 } as const;
 
 const adminProductInclude = {
   category: true,
   inventory: true,
+  flavors: {
+    orderBy: {
+      name: "asc" as const,
+    },
+  },
 } as const;
 
 const mapPublicProduct = (product: {
@@ -44,6 +62,7 @@ const mapPublicProduct = (product: {
   categoryId: number;
   category: { name: string };
   inventory: { quantity: number } | null;
+  flavors: Array<{ id: number; name: string; active: boolean }>;
 }): PublicProductListItem => ({
   id: product.id,
   name: product.name,
@@ -54,6 +73,11 @@ const mapPublicProduct = (product: {
   categoryId: product.categoryId,
   categoryName: product.category.name,
   available: (product.inventory?.quantity ?? 0) > 0,
+  flavors: product.flavors.map((flavor) => ({
+    id: flavor.id,
+    name: flavor.name,
+    active: flavor.active,
+  })),
 });
 
 const mapAdminProduct = (product: {
@@ -68,6 +92,7 @@ const mapAdminProduct = (product: {
   categoryId: number;
   category: { name: string };
   inventory: { quantity: number; minQuantity: number } | null;
+  flavors: Array<{ id: number; name: string; active: boolean }>;
   createdAt: Date;
   updatedAt: Date;
 }): AdminProductListItem => ({
@@ -79,6 +104,13 @@ const mapAdminProduct = (product: {
   createdAt: product.createdAt.toISOString(),
   updatedAt: product.updatedAt.toISOString(),
 });
+
+const normalizeFlavors = (flavors: CreateProductInput["flavors"]) =>
+  flavors.map((flavor) => ({
+    id: flavor.id,
+    name: flavor.name.trim(),
+    active: flavor.active,
+  }));
 
 const buildWhere = (filters: ProductFilters) => ({
   active: filters.includeInactive ? undefined : true,
@@ -178,6 +210,12 @@ export const productService = {
             minQuantity: input.minQuantity,
           },
         },
+        flavors: {
+          create: normalizeFlavors(input.flavors).map((flavor) => ({
+            name: flavor.name,
+            active: flavor.active,
+          })),
+        },
       },
       include: adminProductInclude,
     });
@@ -196,31 +234,72 @@ export const productService = {
       throw new ApiError("Categoria nÃ£o encontrada.", 404);
     }
 
-    const product = await prisma.product.update({
-      where: { id },
-      data: {
-        name: input.name.trim(),
-        slug,
-        description: input.description?.trim() || null,
-        price: toDecimal(input.price),
-        imageUrl: input.imageUrl?.trim() || null,
-        sku: input.sku.trim(),
-        active: input.active,
-        categoryId: input.categoryId,
-        inventory: {
-          upsert: {
-            update: {
-              quantity: input.quantity,
-              minQuantity: input.minQuantity,
-            },
-            create: {
-              quantity: input.quantity,
-              minQuantity: input.minQuantity,
+    const flavors = normalizeFlavors(input.flavors);
+    const product = await prisma.$transaction(async (tx) => {
+      const updatedProduct = await tx.product.update({
+        where: { id },
+        data: {
+          name: input.name.trim(),
+          slug,
+          description: input.description?.trim() || null,
+          price: toDecimal(input.price),
+          imageUrl: input.imageUrl?.trim() || null,
+          sku: input.sku.trim(),
+          active: input.active,
+          categoryId: input.categoryId,
+          inventory: {
+            upsert: {
+              update: {
+                quantity: input.quantity,
+                minQuantity: input.minQuantity,
+              },
+              create: {
+                quantity: input.quantity,
+                minQuantity: input.minQuantity,
+              },
             },
           },
         },
-      },
-      include: adminProductInclude,
+      });
+
+      const flavorIds = flavors.flatMap((flavor) => (flavor.id ? [flavor.id] : []));
+
+      await tx.productFlavor.deleteMany({
+        where: {
+          productId: id,
+          id: {
+            notIn: flavorIds.length > 0 ? flavorIds : [0],
+          },
+        },
+      });
+
+      for (const flavor of flavors) {
+        if (flavor.id) {
+          await tx.productFlavor.updateMany({
+            where: {
+              id: flavor.id,
+              productId: id,
+            },
+            data: {
+              name: flavor.name,
+              active: flavor.active,
+            },
+          });
+        } else {
+          await tx.productFlavor.create({
+            data: {
+              productId: id,
+              name: flavor.name,
+              active: flavor.active,
+            },
+          });
+        }
+      }
+
+      return tx.product.findUniqueOrThrow({
+        where: { id: updatedProduct.id },
+        include: adminProductInclude,
+      });
     });
 
     return mapAdminProduct(product);

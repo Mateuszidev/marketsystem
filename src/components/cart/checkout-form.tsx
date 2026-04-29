@@ -48,6 +48,8 @@ export function CheckoutForm({ settings }: { settings: StoreSettingsDTO }) {
       items.map((item) => ({
         productId: item.productId,
         quantity: item.quantity,
+        flavorId: item.flavorId ?? null,
+        flavorName: item.flavorName ?? null,
       })),
       {
         shouldDirty: false,
@@ -96,6 +98,8 @@ export function CheckoutForm({ settings }: { settings: StoreSettingsDTO }) {
         items: items.map((item) => ({
           productId: item.productId,
           quantity: item.quantity,
+          flavorId: item.flavorId ?? null,
+          flavorName: item.flavorName ?? null,
         })),
       }),
     });
@@ -192,6 +196,18 @@ export function CheckoutForm({ settings }: { settings: StoreSettingsDTO }) {
       <Card className="h-fit">
         <p className="text-sm text-stone-500">Resumo estimado</p>
         <dl className="mt-4 space-y-3 text-sm">
+          {items.length > 0 ? (
+            <div className="space-y-2 border-b border-black/5 pb-3">
+              {items.map((item) => (
+                <div key={`${item.productId}-${item.flavorId ?? item.flavorName ?? "sem-sabor"}`}>
+                  <p className="font-medium text-[var(--color-text)]">
+                    {item.quantity}x {item.name}
+                  </p>
+                  {item.flavorName ? <p className="text-xs text-stone-500">Sabor: {item.flavorName}</p> : null}
+                </div>
+              ))}
+            </div>
+          ) : null}
           <div className="flex items-center justify-between">
             <dt>Subtotal</dt>
             <dd>{formatCurrencyBRL(estimatedSubtotal)}</dd>

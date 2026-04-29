@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -35,7 +35,13 @@ export function ProductForm({ product, categories }: ProductFormProps) {
       categoryId: product?.categoryId || categories[0]?.id || 0,
       quantity: product?.inventoryQuantity || 0,
       minQuantity: product?.minQuantity || 0,
+      flavors: product?.flavors || [],
     },
+  });
+  const flavorFields = useFieldArray({
+    control: form.control,
+    name: "flavors",
+    keyName: "fieldKey",
   });
 
   const onSubmit = form.handleSubmit(async (values) => {
@@ -113,6 +119,44 @@ export function ProductForm({ product, categories }: ProductFormProps) {
           <input type="checkbox" {...form.register("active")} />
           Produto ativo no catálogo
         </label>
+        <div className="rounded-2xl border border-black/10 bg-stone-50 p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-[var(--color-text)]">Sabores</h2>
+              <p className="text-sm text-stone-600">Adicione variacoes que o cliente deve escolher antes de comprar.</p>
+            </div>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => flavorFields.append({ name: "", active: true })}
+            >
+              Adicionar sabor
+            </Button>
+          </div>
+
+          <div className="mt-4 space-y-3">
+            {flavorFields.fields.length === 0 ? (
+              <p className="text-sm text-stone-600">Sem sabores cadastrados. O produto podera ser adicionado diretamente.</p>
+            ) : null}
+            {flavorFields.fields.map((field, index) => (
+              <div key={field.fieldKey} className="grid gap-3 rounded-2xl border border-black/10 bg-white p-3 md:grid-cols-[minmax(0,1fr)_auto_auto] md:items-start">
+                {field.id ? <input type="hidden" {...form.register(`flavors.${index}.id` as const, { valueAsNumber: true })} /> : null}
+                <div>
+                  <label className="mb-2 block text-sm font-medium">Nome do sabor</label>
+                  <Input {...form.register(`flavors.${index}.name` as const)} />
+                  <p className="mt-1 text-sm text-rose-600">{form.formState.errors.flavors?.[index]?.name?.message}</p>
+                </div>
+                <label className="inline-flex items-center gap-2 pt-0 text-sm font-medium md:pt-10">
+                  <input type="checkbox" {...form.register(`flavors.${index}.active` as const)} />
+                  Ativo
+                </label>
+                <Button type="button" variant="ghost" className="md:mt-8" onClick={() => flavorFields.remove(index)}>
+                  Remover
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
         {submitError ? <p className="text-sm text-rose-600">{submitError}</p> : null}
         <Button type="submit" disabled={form.formState.isSubmitting}>
           {form.formState.isSubmitting ? "Salvando..." : "Salvar produto"}

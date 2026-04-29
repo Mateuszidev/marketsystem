@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { PublicProductListItem } from "@/types/product";
+import type { ProductFlavorDTO, PublicProductListItem } from "@/types/product";
 
 export type CartItem = {
   productId: number;
@@ -11,16 +11,21 @@ export type CartItem = {
   imageUrl: string | null;
   quantity: number;
   available: boolean;
+  flavorId?: number | null;
+  flavorName?: string | null;
 };
+
+export const getCartItemKey = (item: Pick<CartItem, "productId" | "flavorId" | "flavorName">) =>
+  `${item.productId}:${item.flavorId ?? item.flavorName ?? "sem-sabor"}`;
 
 type CartState = {
   items: CartItem[];
   hasHydrated: boolean;
   setHasHydrated: (value: boolean) => void;
-  addItem: (product: PublicProductListItem) => void;
-  increaseItem: (productId: number) => void;
-  decreaseItem: (productId: number) => void;
-  removeItem: (productId: number) => void;
+  addItem: (product: PublicProductListItem, flavor?: ProductFlavorDTO | null) => void;
+  increaseItem: (itemKey: string) => void;
+  decreaseItem: (itemKey: string) => void;
+  removeItem: (itemKey: string) => void;
   clearCart: () => void;
   totalItems: () => number;
   subtotal: () => number;
@@ -32,14 +37,19 @@ export const useCartStore = create<CartState>()(
       items: [],
       hasHydrated: false,
       setHasHydrated: (value) => set({ hasHydrated: value }),
-      addItem: (product) =>
+      addItem: (product, flavor = null) =>
         set((state) => {
-          const existing = state.items.find((item) => item.productId === product.id);
+          const nextItemKey = getCartItemKey({
+            productId: product.id,
+            flavorId: flavor?.id ?? null,
+            flavorName: flavor?.name ?? null,
+          });
+          const existing = state.items.find((item) => getCartItemKey(item) === nextItemKey);
 
           if (existing) {
             return {
               items: state.items.map((item) =>
-                item.productId === product.id ? { ...item, quantity: item.quantity + 1 } : item,
+                getCartItemKey(item) === nextItemKey ? { ...item, quantity: item.quantity + 1 } : item,
               ),
             };
           }
@@ -54,27 +64,29 @@ export const useCartStore = create<CartState>()(
                 imageUrl: product.imageUrl,
                 quantity: 1,
                 available: product.available,
+                flavorId: flavor?.id ?? null,
+                flavorName: flavor?.name ?? null,
               },
             ],
           };
         }),
-      increaseItem: (productId) =>
+      increaseItem: (itemKey) =>
         set((state) => ({
           items: state.items.map((item) =>
-            item.productId === productId ? { ...item, quantity: item.quantity + 1 } : item,
+            getCartItemKey(item) === itemKey ? { ...item, quantity: item.quantity + 1 } : item,
           ),
         })),
-      decreaseItem: (productId) =>
+      decreaseItem: (itemKey) =>
         set((state) => ({
           items: state.items
             .map((item) =>
-              item.productId === productId ? { ...item, quantity: Math.max(1, item.quantity - 1) } : item,
+              getCartItemKey(item) === itemKey ? { ...item, quantity: Math.max(1, item.quantity - 1) } : item,
             )
             .filter((item) => item.quantity > 0),
         })),
-      removeItem: (productId) =>
+      removeItem: (itemKey) =>
         set((state) => ({
-          items: state.items.filter((item) => item.productId !== productId),
+          items: state.items.filter((item) => getCartItemKey(item) !== itemKey),
         })),
       clearCart: () => set({ items: [] }),
       totalItems: () => get().items.reduce((sum, item) => sum + item.quantity, 0),

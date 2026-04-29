@@ -41,7 +41,8 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     await requireAdminApiSession();
-    const payload = createProductSchema.parse(await request.json());
+    const body = await request.json();
+    const payload = createProductSchema.parse({ flavors: [], ...body });
     return jsonSuccess(await productService.create(payload), 201);
   } catch (error) {
     return handleRouteError(error);

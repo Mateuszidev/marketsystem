@@ -33,6 +33,7 @@ async function main() {
       categoryId: graos.id,
       quantity: 18,
       minQuantity: 5,
+      flavors: [],
     },
     {
       name: "Feijão Carioca 1kg",
@@ -45,6 +46,7 @@ async function main() {
       categoryId: graos.id,
       quantity: 24,
       minQuantity: 8,
+      flavors: [],
     },
     {
       name: "Refrigerante Cola 2L",
@@ -57,6 +59,7 @@ async function main() {
       categoryId: bebidas.id,
       quantity: 12,
       minQuantity: 4,
+      flavors: ["Cola", "Guarana", "Laranja"],
     },
     {
       name: "Detergente Neutro 500ml",
@@ -69,6 +72,7 @@ async function main() {
       categoryId: limpeza.id,
       quantity: 7,
       minQuantity: 10,
+      flavors: ["Neutro", "Limao"],
     },
   ];
 
@@ -95,6 +99,15 @@ async function main() {
             },
           },
         },
+        flavors: product.flavors
+          ? {
+              deleteMany: {},
+              create: product.flavors.map((name) => ({
+                name,
+                active: true,
+              })),
+            }
+          : undefined,
       },
       create: {
         name: product.name,
@@ -111,6 +124,14 @@ async function main() {
             minQuantity: product.minQuantity,
           },
         },
+        flavors: product.flavors
+          ? {
+              create: product.flavors.map((name) => ({
+                name,
+                active: true,
+              })),
+            }
+          : undefined,
       },
     });
   }

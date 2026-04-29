@@ -57,6 +57,8 @@ const mapOrderDetail = (order: {
   createdAt: Date;
   items: Array<{
     productId: number;
+    flavorId: number | null;
+    flavorName: string | null;
     productNameSnapshot: string;
     unitPriceSnapshot: Prisma.Decimal;
     quantity: number;
@@ -80,6 +82,8 @@ const mapOrderDetail = (order: {
   itemCount: order.items.reduce((sum, item) => sum + item.quantity, 0),
   items: order.items.map((item) => ({
     productId: item.productId,
+    flavorId: item.flavorId,
+    flavorName: item.flavorName,
     productName: item.productNameSnapshot,
     unitPrice: item.unitPriceSnapshot.toNumber(),
     quantity: item.quantity,
@@ -90,16 +94,30 @@ const mapOrderDetail = (order: {
 const normalizePhone = (value: string) => value.replace(/\D/g, "");
 
 const groupOrderItems = (items: CreateOrderInput["items"]) => {
-  const groupedItems = new Map<number, number>();
+  const groupedItems = new Map<
+    string,
+    { productId: number; flavorId: number | null; flavorName: string | null; quantity: number }
+  >();
 
   for (const item of items) {
-    groupedItems.set(item.productId, (groupedItems.get(item.productId) ?? 0) + item.quantity);
+    const flavorId = item.flavorId ?? null;
+    const flavorName = item.flavorName?.trim() || null;
+    const key = `${item.productId}:${flavorId ?? flavorName ?? "sem-sabor"}`;
+    const existing = groupedItems.get(key);
+
+    if (existing) {
+      existing.quantity += item.quantity;
+    } else {
+      groupedItems.set(key, {
+        productId: item.productId,
+        flavorId,
+        flavorName,
+        quantity: item.quantity,
+      });
+    }
   }
 
-  return [...groupedItems.entries()].map(([productId, quantity]) => ({
-    productId,
-    quantity,
-  }));
+  return [...groupedItems.values()];
 };
 
 export const orderService = {
@@ -140,11 +158,16 @@ export const orderService = {
 
   async create(input: CreateOrderInput) {
     const groupedItems = groupOrderItems(input.items);
-    const uniqueIds = groupedItems.map((item) => item.productId);
+    const uniqueIds = [...new Set(groupedItems.map((item) => item.productId))];
     const products = await prisma.product.findMany({
       where: { id: { in: uniqueIds } },
       include: {
         inventory: true,
+        flavors: {
+          where: {
+            active: true,
+          },
+        },
       },
     });
 
@@ -166,6 +189,13 @@ export const orderService = {
       }
 
       const quantity = product.inventory?.quantity ?? 0;
+      const selectedFlavor = item.flavorId
+        ? product.flavors.find((flavor) => flavor.id === item.flavorId)
+        : null;
+
+      if (product.flavors.length > 0 && !selectedFlavor) {
+        throw new ApiError(`Escolha um sabor disponivel para "${product.name}".`, 409);
+      }
 
       if (quantity < item.quantity) {
         throw new ApiError(`Estoque insuficiente para "${product.name}".`, 409);
@@ -176,6 +206,8 @@ export const orderService = {
       return {
         productId: product.id,
         productName: product.name,
+        flavorId: selectedFlavor?.id ?? null,
+        flavorName: selectedFlavor?.name ?? item.flavorName ?? null,
         unitPrice,
         quantity: item.quantity,
         subtotal: unitPrice * item.quantity,
@@ -274,6 +306,8 @@ export const orderService = {
           items: {
             create: normalizedItems.map((item) => ({
               productId: item.productId,
+              flavorId: item.flavorId,
+              flavorName: item.flavorName,
               productNameSnapshot: item.productName,
               unitPriceSnapshot: toDecimal(item.unitPrice.toFixed(2)),
               quantity: item.quantity,

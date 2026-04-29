@@ -1,3 +1,9 @@
+export type ProductFlavorDTO = {
+  id: number;
+  name: string;
+  active: boolean;
+};
+
 export type PublicProductListItem = {
   id: number;
   name: string;
@@ -8,6 +14,7 @@ export type PublicProductListItem = {
   categoryId: number;
   categoryName: string;
   available: boolean;
+  flavors: ProductFlavorDTO[];
 };
 
 export type AdminProductListItem = PublicProductListItem & {

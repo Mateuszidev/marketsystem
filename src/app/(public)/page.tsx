@@ -88,11 +88,7 @@ export default async function HomePage() {
 
       <section className="space-y-4">
         <div className="bp-promo-banner">
-          <div>
-            <p className="bp-promo-title">Gostou, clicou, pediu.</p>
-            <p className="bp-promo-sub">Experiência pensada para o seu melhor conforto e agilidade!</p>
-          </div>
-          <Link href="/produtos" className="btn btn--ghost">
+          <Link href="/produtos" className="btn bp-promo-explore">
             Explorar
           </Link>
         </div>
