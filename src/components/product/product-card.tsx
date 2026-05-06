@@ -58,7 +58,7 @@ export function ProductCard({ product }: { product: PublicProductListItem }) {
           style={{
             background: product.imageUrl
               ? "var(--img-bg)"
-              : "linear-gradient(135deg, rgba(255,111,0,0.16) 0%, rgba(26,41,96,0.95) 100%)",
+              : "linear-gradient(135deg, #eff6ff 0%, #fff7ed 100%)",
           }}
         >
           {product.imageUrl ? (
@@ -78,7 +78,7 @@ export function ProductCard({ product }: { product: PublicProductListItem }) {
             {product.available ? <Badge className="badge badge--yellow">Disponivel</Badge> : null}
           </div>
           {hasFlavors ? (
-            <p className="mt-2 text-xs font-semibold text-[var(--orange2)]">{product.flavors.length} sabores disponiveis</p>
+            <p className="mt-2 text-xs font-semibold text-[var(--color-brand-dark)]">{product.flavors.length} sabores disponiveis</p>
           ) : null}
           {product.description ? <p className="bp-product-desc mt-3 text-sm leading-6">{product.description}</p> : null}
           <div className="bp-product-footer mt-auto">

@@ -12,9 +12,9 @@ export function SiteHeader({ storeName }: SiteHeaderProps) {
 
   return (
     <header className="bp-header">
-      <div className="bp-container flex items-center justify-between gap-4">
+      <div className="bp-container bp-header-inner">
         <Link href="/" className="bp-logo" aria-label={`Ir para a home da loja ${displayName}`}>
-          <div className="bp-logo-icon rounded-xl border-2 border-white/35 bg-white p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.22)]">
+          <div className="bp-logo-icon p-1">
             <Image
               src="/images/logo.png"
               alt={`Logo da loja ${displayName}`}
@@ -29,6 +29,19 @@ export function SiteHeader({ storeName }: SiteHeaderProps) {
             <span className="bp-logo-sub">catalogo e pedidos</span>
           </div>
         </Link>
+
+        <form action="/produtos" className="bp-header-search" role="search">
+          <input
+            name="busca"
+            type="search"
+            className="bp-header-search-input"
+            placeholder="Buscar pods, juices e acessorios"
+            aria-label="Buscar produtos"
+          />
+          <button type="submit" className="bp-header-search-button">
+            Buscar
+          </button>
+        </form>
 
         <nav className="bp-nav">
           <Link href="/produtos" className="bp-nav-link">

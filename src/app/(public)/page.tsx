@@ -55,7 +55,7 @@ export default async function HomePage() {
           </p>
           <div className="bp-hero-actions">
             <Link href="/produtos" className="btn btn--primary">
-              Ver catalogo
+              Ver catálogo
             </Link>
           </div>
         </div>
@@ -69,33 +69,13 @@ export default async function HomePage() {
               </Link>
             ))}
           </div>
-          <div className="bp-stats">
-            <div>
-              <p className="bp-stat-num">{products.length}</p>
-              <p className="bp-stat-lbl">Produtos ativos</p>
-            </div>
-            <div>
-              <p className="bp-stat-num">{categories.length}</p>
-              <p className="bp-stat-lbl">Categorias</p>
-            </div>
-            <div>
-              <p className="bp-stat-num">WhatsApp</p>
-              <p className="bp-stat-lbl">Checkout conversacional</p>
-            </div>
-          </div>
         </Card>
       </section>
 
       <section className="space-y-4">
-        <div className="bp-promo-banner">
-          <Link href="/produtos" className="btn bp-promo-explore">
-            Explorar
-          </Link>
-        </div>
-
         <div className="bp-section-header">
           <div>
-            <p className="bp-section-label">Catalogo</p>
+            <p className="bp-section-label">Catálogo</p>
             <h2 className="bp-section-title">Produtos em destaque</h2>
           </div>
           <Link href="/produtos" className="bp-view-all">
