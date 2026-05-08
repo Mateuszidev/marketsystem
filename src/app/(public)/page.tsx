@@ -4,7 +4,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { ProductCard } from "@/components/product/product-card";
 import { categoryService } from "@/services/category-service";
 import { productService } from "@/services/product-service";
-import { MARKET_DISPLAY_NAME } from "@/lib/brand";
+import { storeService } from "@/services/store-service";
 
 const featuredCategoryOrder = [
   "Pods Descartaveis",
@@ -28,10 +28,12 @@ const featuredCategoryOrderIndex = new Map(
 );
 
 export default async function HomePage() {
-  const [categories, products] = await Promise.all([
+  const [categories, products, settings] = await Promise.all([
     categoryService.list(),
     productService.listPublic(),
+    storeService.getPublic(),
   ]);
+  const storeName = settings.storeName.trim() || "MarketSystem";
   const featuredCategories = [...categories].sort((a, b) => {
     const aIndex = featuredCategoryOrderIndex.get(normalizeCategoryName(a.name)) ?? Number.MAX_SAFE_INTEGER;
     const bIndex = featuredCategoryOrderIndex.get(normalizeCategoryName(b.name)) ?? Number.MAX_SAFE_INTEGER;
@@ -48,7 +50,7 @@ export default async function HomePage() {
       <section className="bp-hero">
         <div className="bp-hero-card">
           <h1 className="bp-hero-title">
-            <span>{MARKET_DISPLAY_NAME}</span>
+            <span>{storeName}</span>
           </h1>
           <p className="bp-hero-desc">
             As melhores ofertas de Pods & Vapes em um só lugar! Variedade premium, atendimento rápido e entrega garantida

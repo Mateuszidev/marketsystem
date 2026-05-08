@@ -42,5 +42,4 @@ next-env.d.ts
 # admin session
 
 # local assistant instructions
-AGENTS.md
-CLAUDE.md
+.md

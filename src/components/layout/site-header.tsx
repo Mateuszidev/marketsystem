@@ -1,14 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { CartButton } from "@/components/cart/cart-button";
-import { MARKET_DISPLAY_NAME } from "@/lib/brand";
 
 type SiteHeaderProps = {
   storeName: string;
 };
 
 export function SiteHeader({ storeName }: SiteHeaderProps) {
-  const displayName = MARKET_DISPLAY_NAME.trim() || storeName;
+  const displayName = storeName.trim() || "MarketSystem";
 
   return (
     <header className="bp-header">
@@ -16,11 +15,11 @@ export function SiteHeader({ storeName }: SiteHeaderProps) {
         <Link href="/" className="bp-logo" aria-label={`Ir para a home da loja ${displayName}`}>
           <div className="bp-logo-icon p-1">
             <Image
-              src="/images/logo.png"
+              src="/images/smk.png"
               alt={`Logo da loja ${displayName}`}
-              width={46}
-              height={46}
-              className="h-full w-full object-contain"
+              width={52}
+              height={52}
+              className="object-contain"
               priority
             />
           </div>

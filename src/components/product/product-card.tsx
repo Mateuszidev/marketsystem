@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -14,6 +14,23 @@ export function ProductCard({ product }: { product: PublicProductListItem }) {
   const [selectedFlavor, setSelectedFlavor] = useState<ProductFlavorDTO | null>(null);
   const [added, setAdded] = useState(false);
   const hasFlavors = product.flavors.length > 0;
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const originalOverflow = document.body.style.overflow;
+    const originalOverscrollBehavior = document.body.style.overscrollBehavior;
+
+    document.body.style.overflow = "hidden";
+    document.body.style.overscrollBehavior = "contain";
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.body.style.overscrollBehavior = originalOverscrollBehavior;
+    };
+  }, [isOpen]);
 
   const openDetails = () => {
     if (!product.available) {
@@ -99,9 +116,9 @@ export function ProductCard({ product }: { product: PublicProductListItem }) {
       </Card>
 
       {isOpen ? (
-        <div className="fixed inset-0 z-[1000] flex items-end bg-black/60 p-3 sm:items-center sm:justify-center" onClick={closeDetails}>
+        <div className="fixed inset-0 z-[1000] flex items-end overflow-hidden overscroll-none bg-black/60 p-3 sm:items-center sm:justify-center" onClick={closeDetails}>
           <div
-            className="w-full max-w-lg rounded-[var(--radius)] bg-white p-5 shadow-2xl"
+            className="flex max-h-[calc(100dvh-1.5rem)] w-full max-w-lg flex-col overflow-hidden rounded-[var(--radius)] bg-white p-5 shadow-2xl"
             role="dialog"
             aria-modal="true"
             aria-labelledby={`product-details-${product.id}`}
@@ -130,7 +147,7 @@ export function ProductCard({ product }: { product: PublicProductListItem }) {
             {hasFlavors ? (
               <div className="mt-5">
                 <p className="text-sm font-bold text-[var(--color-text)]">Escolha um sabor para continuar</p>
-                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                <div className="mt-3 grid max-h-[60vh] gap-2 overflow-y-auto overscroll-contain pr-1 sm:grid-cols-2">
                   {product.flavors.map((flavor) => {
                     const isSelected = selectedFlavor?.id === flavor.id;
 
