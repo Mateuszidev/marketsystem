@@ -71,7 +71,7 @@ export default async function ProdutosPage({ searchParams }: ProdutosPageProps) 
     <div className="space-y-6">
       <div>
         <p className="text-sm uppercase tracking-[0.18em] text-[var(--muted)]">Produtos</p>
-        <h1 className="text-4xl font-black tracking-tight text-[var(--color-text)]">Catálogo completo</h1>
+        <h1 className="text-4xl font-black tracking-tight text-[var(--text-primary)]">Catálogo completo</h1>
       </div>
 
       <form className="bp-filter-form grid gap-4 md:grid-cols-[minmax(0,1fr)_220px_auto]">
@@ -102,10 +102,10 @@ export default async function ProdutosPage({ searchParams }: ProdutosPageProps) 
         <div className="space-y-10">
           {productGroups.map((group) => (
             <section key={group.key} className="space-y-4">
-              <div className="flex flex-col gap-1 border-b border-[var(--color-border)] pb-3 sm:flex-row sm:items-end sm:justify-between">
+              <div className="flex flex-col gap-1 border-b border-white/15 pb-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-brand-dark)]">Categoria</p>
-                  <h2 className="text-2xl font-black tracking-tight text-[var(--color-text)]">{group.name}</h2>
+                  <h2 className="text-2xl font-black tracking-tight text-[var(--text-primary)]">{group.name}</h2>
                 </div>
                 <p className="text-sm font-semibold text-[var(--muted)]">
                   {group.products.length} {group.products.length === 1 ? "produto" : "produtos"}
