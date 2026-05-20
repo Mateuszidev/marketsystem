@@ -63,13 +63,12 @@ export function CheckoutForm({ settings }: { settings: StoreSettingsDTO }) {
     return (
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <Card>
-          <h1 className="text-3xl font-black tracking-tight text-[var(--color-text)]">Finalizar pedido</h1>
-          <p className="mt-2 text-sm text-stone-600">Carregando os itens salvos no carrinho para montar o resumo do pedido.</p>
+          <h1 className="text-2xl font-black tracking-tight text-[var(--color-text)]">Finalizar pedido</h1>
+          <p className="mt-2 text-sm text-[var(--color-soft-text)]">Carregando itens do carrinho...</p>
         </Card>
-
         <Card className="h-fit">
-          <p className="text-sm text-stone-500">Resumo estimado</p>
-          <p className="mt-4 text-sm text-stone-600">Sincronizando carrinho...</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-soft-text)]">Resumo</p>
+          <p className="mt-4 text-sm text-[var(--color-soft-text)]">Sincronizando...</p>
         </Card>
       </div>
     );
@@ -120,65 +119,77 @@ export function CheckoutForm({ settings }: { settings: StoreSettingsDTO }) {
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
       <Card>
-        <h1 className="text-3xl font-black tracking-tight text-[var(--color-text)]">Finalizar pedido</h1>
-        <p className="mt-2 text-sm text-stone-600">Preencha os dados e o sistema vai gerar o pedido no banco antes do redirecionamento.</p>
+        <h1 className="text-2xl font-black tracking-tight text-[var(--color-text)]">Finalizar pedido</h1>
+        <p className="mt-1 text-sm text-[var(--color-soft-text)]">Preencha seus dados para gerar o pedido via WhatsApp.</p>
 
-        <form className="mt-8 grid gap-4" onSubmit={onSubmit}>
-          <div>
-            <span className="mb-2 block text-sm font-medium">Modalidade</span>
+        <form className="mt-6 grid gap-5" onSubmit={onSubmit}>
+          <fieldset className="grid gap-4">
+            <legend className="mb-3 text-sm font-bold text-[var(--color-text)]">Modalidade de entrega</legend>
             <div className="grid gap-3 sm:grid-cols-2">
-              <label className={`rounded-2xl border px-4 py-3 text-sm ${settings.acceptsDelivery ? "border-black/10" : "cursor-not-allowed border-black/5 opacity-50"}`}>
-                <input type="radio" value="delivery" className="mr-2" disabled={!settings.acceptsDelivery} {...form.register("fulfillmentType")} />
+              <label className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-sm font-medium transition ${
+                fulfillmentType === "delivery" ? "border-[var(--color-brand)] bg-[rgba(37,99,235,0.04)] text-[var(--color-text)]" : "border-black/6 text-[var(--color-soft-text)]"
+              } ${!settings.acceptsDelivery ? "cursor-not-allowed opacity-40" : ""}`}>
+                <input type="radio" value="delivery" className="accent-[var(--color-brand)]" disabled={!settings.acceptsDelivery} {...form.register("fulfillmentType")} />
                 Entrega
               </label>
-              <label className={`rounded-2xl border px-4 py-3 text-sm ${settings.acceptsPickup ? "border-black/10" : "cursor-not-allowed border-black/5 opacity-50"}`}>
-                <input type="radio" value="pickup" className="mr-2" disabled={!settings.acceptsPickup} {...form.register("fulfillmentType")} />
+              <label className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-sm font-medium transition ${
+                fulfillmentType === "pickup" ? "border-[var(--color-brand)] bg-[rgba(37,99,235,0.04)] text-[var(--color-text)]" : "border-black/6 text-[var(--color-soft-text)]"
+              } ${!settings.acceptsPickup ? "cursor-not-allowed opacity-40" : ""}`}>
+                <input type="radio" value="pickup" className="accent-[var(--color-brand)]" disabled={!settings.acceptsPickup} {...form.register("fulfillmentType")} />
                 Retirada
               </label>
             </div>
-            <p className="mt-1 text-sm text-rose-600">{form.formState.errors.fulfillmentType?.message}</p>
-          </div>
+            {form.formState.errors.fulfillmentType?.message ? (
+              <p className="text-sm text-rose-600">{form.formState.errors.fulfillmentType.message}</p>
+            ) : null}
+          </fieldset>
 
-          <div>
-            <label className="mb-2 block text-sm font-medium">Nome</label>
-            <Input {...form.register("customerName")} />
-            <p className="mt-1 text-sm text-rose-600">{form.formState.errors.customerName?.message}</p>
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium">Telefone</label>
-            <Input {...form.register("customerPhone")} />
-            <p className="mt-1 text-sm text-rose-600">{form.formState.errors.customerPhone?.message}</p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">Nome</label>
+              <Input placeholder="Seu nome completo" {...form.register("customerName")} />
+              {form.formState.errors.customerName?.message ? (
+                <p className="mt-1 text-xs text-rose-600">{form.formState.errors.customerName.message}</p>
+              ) : null}
+            </div>
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">Telefone</label>
+              <Input placeholder="(00) 00000-0000" {...form.register("customerPhone")} />
+              {form.formState.errors.customerPhone?.message ? (
+                <p className="mt-1 text-xs text-rose-600">{form.formState.errors.customerPhone.message}</p>
+              ) : null}
+            </div>
           </div>
 
           {isPickup ? (
-            <div className="rounded-2xl border border-dashed border-black/10 bg-stone-50 px-4 py-3 text-sm text-stone-600">
-              Pedido para retirada não exige endereço. Se quiser, use a observação para combinar detalhes com a loja.
+            <div className="rounded-xl border border-dashed border-[var(--color-brand)]/20 bg-[rgba(37,99,235,0.03)] px-4 py-3 text-sm text-[var(--color-soft-text)]">
+              Pedido para retirada não exige endereço. Use a observação para combinar detalhes.
             </div>
           ) : (
             <>
               <div>
-                <label className="mb-2 block text-sm font-medium">Endereço</label>
-                <Input {...form.register("customerAddress")} />
-                <p className="mt-1 text-sm text-rose-600">{form.formState.errors.customerAddress?.message}</p>
+                <label className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">Endereço</label>
+                <Input placeholder="Rua, número" {...form.register("customerAddress")} />
+                {form.formState.errors.customerAddress?.message ? (
+                  <p className="mt-1 text-xs text-rose-600">{form.formState.errors.customerAddress.message}</p>
+                ) : null}
               </div>
-
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-2 block text-sm font-medium">Bairro</label>
-                  <Input {...form.register("customerNeighborhood")} />
+                  <label className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">Bairro</label>
+                  <Input placeholder="Bairro" {...form.register("customerNeighborhood")} />
                 </div>
                 <div>
-                  <label className="mb-2 block text-sm font-medium">Referência</label>
-                  <Input {...form.register("customerReference")} />
+                  <label className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">Referência</label>
+                  <Input placeholder="Ponto de referência" {...form.register("customerReference")} />
                 </div>
               </div>
             </>
           )}
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Observação</label>
-            <Textarea {...form.register("notes")} />
+            <label className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">Observação</label>
+            <Textarea placeholder="Alguma observação sobre o pedido?" {...form.register("notes")} />
           </div>
 
           {!hasAvailableMethod ? <p className="text-sm text-rose-600">A loja está com pedidos temporariamente indisponíveis.</p> : null}
@@ -187,41 +198,41 @@ export function CheckoutForm({ settings }: { settings: StoreSettingsDTO }) {
           ) : null}
           {submitError ? <p className="text-sm text-rose-600">{submitError}</p> : null}
 
-          <Button type="submit" className="mt-2" disabled={form.formState.isSubmitting || !hasAvailableMethod}>
+          <Button type="submit" className="mt-1 w-full" disabled={form.formState.isSubmitting || !hasAvailableMethod}>
             {form.formState.isSubmitting ? "Gerando pedido..." : "Gerar pedido e abrir WhatsApp"}
           </Button>
         </form>
       </Card>
 
-      <Card className="h-fit">
-        <p className="text-sm text-stone-500">Resumo estimado</p>
+      <Card className="h-fit sticky top-24">
+        <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-soft-text)]">Resumo do pedido</p>
         <dl className="mt-4 space-y-3 text-sm">
           {items.length > 0 ? (
             <div className="space-y-2 border-b border-black/5 pb-3">
               {items.map((item) => (
                 <div key={`${item.productId}-${item.flavorId ?? item.flavorName ?? "sem-sabor"}`}>
                   <p className="font-medium text-[var(--color-text)]">
-                    {item.quantity}x {item.name}
+                    {item.quantity}× {item.name}
                   </p>
-                  {item.flavorName ? <p className="text-xs text-stone-500">Sabor: {item.flavorName}</p> : null}
+                  {item.flavorName ? <p className="text-xs text-[var(--color-soft-text)]">Sabor: {item.flavorName}</p> : null}
                 </div>
               ))}
             </div>
           ) : null}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between text-[var(--color-soft-text)]">
             <dt>Subtotal</dt>
-            <dd>{formatCurrencyBRL(estimatedSubtotal)}</dd>
+            <dd className="font-medium">{formatCurrencyBRL(estimatedSubtotal)}</dd>
           </div>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between text-[var(--color-soft-text)]">
             <dt>{isPickup ? "Retirada" : "Entrega"}</dt>
-            <dd>{formatCurrencyBRL(estimatedDeliveryFee)}</dd>
+            <dd className="font-medium">{formatCurrencyBRL(estimatedDeliveryFee)}</dd>
           </div>
-          <div className="flex items-center justify-between font-semibold text-[var(--color-text)]">
-            <dt>Total estimado</dt>
+          <div className="flex items-center justify-between border-t border-black/5 pt-3 text-base font-bold text-[var(--color-text)]">
+            <dt>Total</dt>
             <dd>{formatCurrencyBRL(estimatedTotal)}</dd>
           </div>
         </dl>
-        <p className="mt-4 text-sm text-stone-500">Pedido mínimo: {formatCurrencyBRL(settings.minimumOrderValue)}</p>
+        <p className="mt-4 text-xs text-[var(--color-soft-text)]">Pedido mínimo: {formatCurrencyBRL(settings.minimumOrderValue)}</p>
       </Card>
     </div>
   );

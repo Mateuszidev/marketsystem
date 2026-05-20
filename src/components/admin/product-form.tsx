@@ -122,8 +122,8 @@ export function ProductForm({ product, categories }: ProductFormProps) {
         <div className="rounded-2xl border border-black/10 bg-stone-50 p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-[var(--color-text)]">Sabores</h2>
-              <p className="text-sm text-stone-600">Adicione variacoes que o cliente deve escolher antes de comprar.</p>
+              <h2 className="text-lg font-semibold text-stone-900">Sabores</h2>
+              <p className="text-sm text-stone-500">Adicione variacoes que o cliente deve escolher antes de comprar.</p>
             </div>
             <Button
               type="button"
@@ -136,7 +136,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
 
           <div className="mt-4 space-y-3">
             {flavorFields.fields.length === 0 ? (
-              <p className="text-sm text-stone-600">Sem sabores cadastrados. O produto podera ser adicionado diretamente.</p>
+              <p className="text-sm text-stone-500">Sem sabores cadastrados. O produto podera ser adicionado diretamente.</p>
             ) : null}
             {flavorFields.fields.map((field, index) => (
               <div key={field.fieldKey} className="grid gap-3 rounded-2xl border border-black/10 bg-white p-3 md:grid-cols-[minmax(0,1fr)_auto_auto] md:items-start">

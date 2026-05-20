@@ -75,33 +75,35 @@ export function ProductCard({ product }: { product: PublicProductListItem }) {
           style={{
             background: product.imageUrl
               ? "var(--img-bg)"
-              : "linear-gradient(135deg, #eff6ff 0%, #fff7ed 100%)",
+              : "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
           }}
         >
           {product.imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={product.imageUrl} alt={product.name} className="bp-product-image h-full w-full object-contain" />
           ) : (
-            <div className="text-sm font-bold uppercase tracking-[0.18em] text-[var(--orange2)]">Sem imagem</div>
+            <div className="text-xs font-bold uppercase tracking-[0.15em] text-[var(--color-muted)]">Sem imagem</div>
           )}
-          {!product.available ? <span className="bp-product-tag">Sem estoque</span> : <span className="bp-product-tag">Destaque</span>}
+          {!product.available ? (
+            <span className="bp-product-tag" style={{ background: "rgba(239,68,68,.1)", color: "#dc2626" }}>Sem estoque</span>
+          ) : null}
         </div>
         <div className="bp-product-body flex flex-1 flex-col">
-          <div className="flex items-start justify-between gap-3">
-            <div>
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
               <p className="bp-product-unit">{product.categoryName}</p>
               <h3 className="bp-product-name">{product.name}</h3>
             </div>
-            {product.available ? <Badge className="badge badge--yellow">Disponivel</Badge> : null}
+            {product.available ? <Badge className="badge badge--yellow shrink-0">Disponível</Badge> : null}
           </div>
           {hasFlavors ? (
-            <p className="mt-2 text-xs font-semibold text-[var(--color-brand-dark)]">{product.flavors.length} sabores disponiveis</p>
+            <p className="mt-1.5 text-xs font-semibold text-[var(--color-brand)]">{product.flavors.length} sabores</p>
           ) : null}
-          {product.description ? <p className="bp-product-desc mt-3 text-sm leading-6">{product.description}</p> : null}
+          {product.description ? <p className="bp-product-desc mt-2 line-clamp-2 text-sm leading-relaxed">{product.description}</p> : null}
           <div className="bp-product-footer mt-auto">
             <p className="bp-product-price">{formatCurrencyBRL(product.price)}</p>
             <Button
-              className="w-full"
+              className="shrink-0 px-4 py-2 text-xs"
               variant={product.available ? "primary" : "secondary"}
               disabled={!product.available}
               onClick={(event) => {
@@ -109,45 +111,53 @@ export function ProductCard({ product }: { product: PublicProductListItem }) {
                 openDetails();
               }}
             >
-              {!product.available ? "Indisponivel" : hasFlavors ? "Escolher sabor" : "Adicionar"}
+              {!product.available ? "Indisponível" : added ? "✓ Adicionado" : hasFlavors ? "Escolher" : "Adicionar"}
             </Button>
           </div>
         </div>
       </Card>
 
       {isOpen ? (
-        <div className="fixed inset-0 z-[1000] flex items-end overflow-hidden overscroll-none bg-black/60 p-3 sm:items-center sm:justify-center" onClick={closeDetails}>
+        <div
+          className="fixed inset-0 z-[1000] flex items-end overflow-hidden overscroll-none bg-black/50 p-3 backdrop-blur-sm sm:items-center sm:justify-center"
+          onClick={closeDetails}
+          style={{ animation: "fadeIn 150ms ease" }}
+        >
           <div
-            className="flex max-h-[calc(100dvh-1.5rem)] w-full max-w-lg flex-col overflow-hidden rounded-[var(--radius)] bg-white p-5 shadow-2xl"
+            className="flex max-h-[calc(100dvh-1.5rem)] w-full max-w-md flex-col overflow-hidden rounded-2xl bg-white p-6 shadow-2xl"
             role="dialog"
             aria-modal="true"
             aria-labelledby={`product-details-${product.id}`}
             onClick={(event) => event.stopPropagation()}
+            style={{ animation: "slideInRight 220ms cubic-bezier(.22,1,.36,1)" }}
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-stone-500">{product.categoryName}</p>
-                <h2 id={`product-details-${product.id}`} className="mt-1 text-2xl font-black text-[var(--color-text)]">
+                <p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--color-brand)]">{product.categoryName}</p>
+                <h2 id={`product-details-${product.id}`} className="mt-1 text-xl font-black text-[var(--color-text)]">
                   {product.name}
                 </h2>
               </div>
               <button
                 type="button"
-                className="rounded-full border border-black/10 px-3 py-1 text-sm font-bold text-[var(--color-text)]"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-surface-alt)] text-[var(--color-soft-text)] transition hover:bg-[var(--color-border-strong)]"
                 onClick={closeDetails}
                 aria-label="Fechar"
               >
-                X
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <line x1="1" y1="1" x2="13" y2="13" />
+                  <line x1="13" y1="1" x2="1" y2="13" />
+                </svg>
               </button>
             </div>
 
-            {product.description ? <p className="mt-3 text-sm leading-6 text-stone-600">{product.description}</p> : null}
-            <p className="mt-4 text-2xl font-black text-[var(--orange)]">{formatCurrencyBRL(product.price)}</p>
+            {product.description ? <p className="mt-3 text-sm leading-relaxed text-[var(--color-soft-text)]">{product.description}</p> : null}
+            <p className="mt-4 text-2xl font-black text-[var(--color-text)]">{formatCurrencyBRL(product.price)}</p>
 
             {hasFlavors ? (
               <div className="mt-5">
-                <p className="text-sm font-bold text-[var(--color-text)]">Escolha um sabor para continuar</p>
-                <div className="mt-3 grid max-h-[60vh] gap-2 overflow-y-auto overscroll-contain pr-1 sm:grid-cols-2">
+                <p className="text-sm font-bold text-[var(--color-text)]">Escolha um sabor</p>
+                <div className="mt-3 grid max-h-[50vh] gap-2 overflow-y-auto overscroll-contain pr-1 sm:grid-cols-2">
                   {product.flavors.map((flavor) => {
                     const isSelected = selectedFlavor?.id === flavor.id;
 
@@ -155,10 +165,10 @@ export function ProductCard({ product }: { product: PublicProductListItem }) {
                       <button
                         key={flavor.id}
                         type="button"
-                        className={`rounded-[var(--radius-sm)] border px-4 py-3 text-left text-sm font-semibold transition ${
+                        className={`rounded-xl border px-4 py-2.5 text-left text-sm font-medium transition ${
                           isSelected
-                            ? "border-[var(--orange)] bg-[var(--color-surface-warm)] text-[var(--color-text)]"
-                            : "border-black/10 bg-white text-stone-700 hover:border-[var(--orange)]"
+                            ? "border-[var(--color-accent)] bg-[var(--color-surface-warm)] text-[var(--color-text)]"
+                            : "border-[rgba(0,0,0,0.06)] bg-[var(--color-surface-alt)] text-[var(--color-soft-text)] hover:border-[var(--color-accent)] hover:text-[var(--color-text)]"
                         }`}
                         onClick={() => setSelectedFlavor(flavor)}
                       >
@@ -171,7 +181,7 @@ export function ProductCard({ product }: { product: PublicProductListItem }) {
             ) : null}
 
             <Button className="mt-6 w-full" disabled={hasFlavors && !selectedFlavor} onClick={handleAdd}>
-              {added ? "Adicionado" : "Adicionar ao carrinho"}
+              {added ? "✓ Adicionado ao carrinho" : "Adicionar ao carrinho"}
             </Button>
           </div>
         </div>

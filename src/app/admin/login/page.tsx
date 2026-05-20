@@ -11,7 +11,7 @@ export default async function AdminLoginPage({ searchParams }: AdminLoginPagePro
   await redirectAuthenticatedAdmin(from);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#f4f1ea] px-4 py-10">
+    <div className="flex min-h-screen items-center justify-center bg-[#f8f9fa] px-4 py-10">
       <AdminLoginForm from={from} />
     </div>
   );

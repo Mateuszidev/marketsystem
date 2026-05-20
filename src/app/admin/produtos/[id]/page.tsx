@@ -17,8 +17,8 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-sm uppercase tracking-[0.18em] text-stone-500">Admin</p>
-        <h1 className="text-4xl font-black tracking-tight text-[var(--color-text)]">Editar produto</h1>
+        <p className="text-xs font-bold uppercase tracking-[0.12em] text-stone-500">Admin</p>
+        <h1 className="text-3xl font-black tracking-tight text-stone-900">Editar produto</h1>
       </div>
       <ProductForm categories={categories} product={product} />
       <InventoryForm productId={product.id} quantity={product.inventoryQuantity} minQuantity={product.minQuantity} />

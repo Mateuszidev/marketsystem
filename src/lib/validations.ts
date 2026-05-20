@@ -114,6 +114,26 @@ export const updateStoreSettingsSchema = z
     path: ["acceptsDelivery"],
   });
 
+export const createHighlightSchema = z.object({
+  title: trimmedString("Título"),
+  description: z.string().trim().max(280, "Descrição muito longa.").optional().or(z.literal("")),
+  imageUrl: z
+    .string()
+    .trim()
+    .min(1, "Imagem é obrigatória.")
+    .url("Informe uma URL válida para a imagem."),
+  buttonText: z.string().trim().max(40, "Texto do botão muito longo.").optional().or(z.literal("")),
+  buttonLink: z.string().trim().max(500, "Link muito longo.").optional().or(z.literal("")),
+  active: z.boolean(),
+  order: z.number().int().min(0, "A ordem não pode ser negativa.").max(9999, "Ordem inválida."),
+});
+
+export const updateHighlightSchema = createHighlightSchema;
+
+export const reorderHighlightsSchema = z.object({
+  ids: z.array(z.number().int().positive()).min(1, "Informe ao menos um destaque."),
+});
+
 export type CreateCategoryInput = z.infer<typeof createCategorySchema>;
 export type UpdateCategoryInput = z.infer<typeof updateCategorySchema>;
 export type CreateProductInput = z.infer<typeof createProductSchema>;
@@ -122,3 +142,6 @@ export type UpdateInventoryInput = z.infer<typeof updateInventorySchema>;
 export type CreateOrderInput = z.infer<typeof createOrderSchema>;
 export type UpdateOrderStatusInput = z.infer<typeof updateOrderStatusSchema>;
 export type UpdateStoreSettingsInput = z.infer<typeof updateStoreSettingsSchema>;
+export type CreateHighlightInput = z.infer<typeof createHighlightSchema>;
+export type UpdateHighlightInput = z.infer<typeof updateHighlightSchema>;
+export type ReorderHighlightsInput = z.infer<typeof reorderHighlightsSchema>;

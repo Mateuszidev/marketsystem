@@ -48,34 +48,36 @@ export function StoreSettingsForm({ settings }: { settings: AdminStoreSettingsDT
       <form className="grid gap-4" onSubmit={onSubmit}>
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <label className="mb-2 block text-sm font-medium">Nome da loja</label>
+            <label className="mb-1.5 block text-sm font-medium text-stone-700">Nome da loja</label>
             <Input {...form.register("storeName")} />
           </div>
           <div>
-            <label className="mb-2 block text-sm font-medium">WhatsApp</label>
+            <label className="mb-1.5 block text-sm font-medium text-stone-700">WhatsApp</label>
             <Input {...form.register("whatsappNumber")} />
           </div>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <label className="mb-2 block text-sm font-medium">Taxa de entrega</label>
+            <label className="mb-1.5 block text-sm font-medium text-stone-700">Taxa de entrega</label>
             <Input type="number" step="0.01" {...form.register("deliveryFee", { valueAsNumber: true })} />
             <p className="mt-1 text-xs text-stone-500">Aplicada apenas quando o cliente escolher entrega.</p>
           </div>
           <div>
-            <label className="mb-2 block text-sm font-medium">Pedido mínimo</label>
+            <label className="mb-1.5 block text-sm font-medium text-stone-700">Pedido mínimo</label>
             <Input type="number" step="0.01" {...form.register("minimumOrderValue", { valueAsNumber: true })} />
           </div>
         </div>
-        <label className="inline-flex items-center gap-2 text-sm font-medium">
-          <input type="checkbox" {...form.register("acceptsPickup")} />
+        <label className="inline-flex items-center gap-2 text-sm font-medium text-stone-700">
+          <input type="checkbox" className="accent-blue-600" {...form.register("acceptsPickup")} />
           Aceita retirada
         </label>
-        <label className="inline-flex items-center gap-2 text-sm font-medium">
-          <input type="checkbox" {...form.register("acceptsDelivery")} />
+        <label className="inline-flex items-center gap-2 text-sm font-medium text-stone-700">
+          <input type="checkbox" className="accent-blue-600" {...form.register("acceptsDelivery")} />
           Aceita entrega
         </label>
-        <p className="text-sm text-rose-600">{form.formState.errors.acceptsDelivery?.message}</p>
+        {form.formState.errors.acceptsDelivery?.message ? (
+          <p className="text-sm text-rose-600">{form.formState.errors.acceptsDelivery.message}</p>
+        ) : null}
         {submitError ? <p className="text-sm text-rose-600">{submitError}</p> : null}
         <Button type="submit" disabled={form.formState.isSubmitting}>
           {form.formState.isSubmitting ? "Salvando..." : "Salvar configurações"}

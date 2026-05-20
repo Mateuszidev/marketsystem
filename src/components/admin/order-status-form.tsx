@@ -36,7 +36,7 @@ export function OrderStatusForm({ orderId, currentStatus }: { orderId: number; c
 
   return (
     <Card>
-      <h2 className="text-lg font-semibold text-[var(--color-text)]">Status do pedido</h2>
+      <h2 className="text-lg font-semibold text-stone-900">Status do pedido</h2>
       <div className="mt-4 flex flex-col gap-3 sm:flex-row">
         <Select value={status} onChange={(event) => setStatus(event.target.value as OrderStatus)}>
           <option value="pending">Pendente</option>

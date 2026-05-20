@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { CartButton } from "@/components/cart/cart-button";
+import { MobileMenu } from "@/components/layout/mobile-menu";
 
 type SiteHeaderProps = {
   storeName: string;
@@ -17,15 +18,15 @@ export function SiteHeader({ storeName }: SiteHeaderProps) {
             <Image
               src="/images/smk.png"
               alt={`Logo da loja ${displayName}`}
-              width={52}
-              height={52}
+              width={44}
+              height={44}
               className="object-contain"
               priority
             />
           </div>
           <div className="bp-logo-text">
             <span className="bp-logo-main">{displayName}</span>
-            <span className="bp-logo-sub">catalogo e pedidos</span>
+            <span className="bp-logo-sub">catálogo e pedidos</span>
           </div>
         </Link>
 
@@ -34,7 +35,7 @@ export function SiteHeader({ storeName }: SiteHeaderProps) {
             name="busca"
             type="search"
             className="bp-header-search-input"
-            placeholder="Buscar pods, juices e acessorios"
+            placeholder="Buscar produtos..."
             aria-label="Buscar produtos"
           />
           <button type="submit" className="bp-header-search-button">
@@ -50,6 +51,7 @@ export function SiteHeader({ storeName }: SiteHeaderProps) {
             Admin
           </Link>
           <CartButton />
+          <MobileMenu />
         </nav>
       </div>
     </header>

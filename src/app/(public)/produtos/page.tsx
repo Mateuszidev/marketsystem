@@ -70,15 +70,15 @@ export default async function ProdutosPage({ searchParams }: ProdutosPageProps) 
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-sm uppercase tracking-[0.18em] text-[var(--muted)]">Produtos</p>
-        <h1 className="text-4xl font-black tracking-tight text-[var(--text-primary)]">Catálogo completo</h1>
+        <p className="text-xs font-bold uppercase tracking-[0.15em] text-[var(--muted)]">Produtos</p>
+        <h1 className="text-3xl font-black tracking-tight text-[var(--text-primary)]">Catálogo completo</h1>
       </div>
 
-      <form className="bp-filter-form grid gap-4 md:grid-cols-[minmax(0,1fr)_220px_auto]">
+      <form className="bp-filter-form grid gap-3 md:grid-cols-[minmax(0,1fr)_200px_auto]">
         <input
           name="busca"
           defaultValue={filters.busca || ""}
-          placeholder="Buscar por nome"
+          placeholder="Buscar por nome..."
           className="bp-filter-control"
         />
         <select
@@ -93,7 +93,9 @@ export default async function ProdutosPage({ searchParams }: ProdutosPageProps) 
             </option>
           ))}
         </select>
-        <button className="rounded-2xl bg-[var(--orange)] px-5 py-3 text-sm font-semibold text-white">Filtrar</button>
+        <button className="rounded-xl bg-[var(--orange)] px-5 py-3 text-sm font-bold text-white transition hover:bg-[var(--color-accent-dark)]">
+          Filtrar
+        </button>
       </form>
 
       {products.length === 0 ? (
@@ -102,12 +104,12 @@ export default async function ProdutosPage({ searchParams }: ProdutosPageProps) 
         <div className="space-y-10">
           {productGroups.map((group) => (
             <section key={group.key} className="space-y-4">
-              <div className="flex flex-col gap-1 border-b border-white/15 pb-3 sm:flex-row sm:items-end sm:justify-between">
+              <div className="flex flex-col gap-1 border-b border-white/10 pb-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--color-brand-dark)]">Categoria</p>
-                  <h2 className="text-2xl font-black tracking-tight text-[var(--text-primary)]">{group.name}</h2>
+                  <p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--color-brand-dark)]">Categoria</p>
+                  <h2 className="text-xl font-black tracking-tight text-[var(--text-primary)]">{group.name}</h2>
                 </div>
-                <p className="text-sm font-semibold text-[var(--muted)]">
+                <p className="text-sm font-medium text-[var(--muted)]">
                   {group.products.length} {group.products.length === 1 ? "produto" : "produtos"}
                 </p>
               </div>

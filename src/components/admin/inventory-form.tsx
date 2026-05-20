@@ -46,7 +46,7 @@ export function InventoryForm({ productId, quantity, minQuantity }: InventoryFor
 
   return (
     <Card>
-      <h2 className="text-lg font-semibold text-[var(--color-text)]">Ajuste rápido de estoque</h2>
+      <h2 className="text-lg font-semibold text-stone-900">Ajuste rápido de estoque</h2>
       <form className="mt-4 grid gap-4 md:grid-cols-[1fr_1fr_auto]" onSubmit={onSubmit}>
         <Input type="number" {...form.register("quantity", { valueAsNumber: true })} />
         <Input type="number" {...form.register("minQuantity", { valueAsNumber: true })} />

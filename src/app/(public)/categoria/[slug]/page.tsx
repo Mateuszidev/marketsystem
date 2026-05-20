@@ -21,8 +21,8 @@ export default async function CategoriaPage({ params }: CategoriaPageProps) {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-sm uppercase tracking-[0.18em] text-stone-500">Categoria</p>
-        <h1 className="text-4xl font-black tracking-tight text-[var(--text-primary)]">{category.name}</h1>
+        <p className="text-xs font-bold uppercase tracking-[0.15em] text-[var(--muted)]">Categoria</p>
+        <h1 className="text-3xl font-black tracking-tight text-[var(--text-primary)]">{category.name}</h1>
       </div>
 
       {products.length === 0 ? (
@@ -31,7 +31,7 @@ export default async function CategoriaPage({ params }: CategoriaPageProps) {
           description="Cadastre itens nesta categoria para exibi-los aqui."
         />
       ) : (
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <div className="bp-product-grid">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { HighlightCarousel } from "@/components/highlight/highlight-carousel";
 import { ProductCard } from "@/components/product/product-card";
 import { categoryService } from "@/services/category-service";
+import { highlightService } from "@/services/highlight-service";
 import { productService } from "@/services/product-service";
 import { storeService } from "@/services/store-service";
 
@@ -28,10 +30,11 @@ const featuredCategoryOrderIndex = new Map(
 );
 
 export default async function HomePage() {
-  const [categories, products, settings] = await Promise.all([
+  const [categories, products, settings, highlights] = await Promise.all([
     categoryService.list(),
     productService.listPublic(),
     storeService.getPublic(),
+    highlightService.listPublic(),
   ]);
   const storeName = settings.storeName.trim() || "MarketSystem";
   const featuredCategories = [...categories].sort((a, b) => {
@@ -53,17 +56,18 @@ export default async function HomePage() {
             <span>{storeName}</span>
           </h1>
           <p className="bp-hero-desc">
-            As melhores ofertas de Pods & Vapes em um só lugar! Variedade premium, atendimento rápido e entrega garantida
+            As melhores ofertas de Pods & Vapes em um só lugar. Variedade premium, atendimento rápido e entrega garantida.
           </p>
           <div className="bp-hero-actions">
             <Link href="/produtos" className="btn btn--primary">
-              Ver catálogo
+              Ver catálogo completo
             </Link>
           </div>
         </div>
 
         <Card className="bp-cat-card">
-          <p className="bp-section-label">Categorias em destaque</p>
+          <p className="bp-section-label">Categorias</p>
+          <h3 className="text-lg font-bold text-[var(--color-text)]">Navegue por categoria</h3>
           <div className="bp-cat-pills">
             {featuredCategories.map((category) => (
               <Link key={category.id} href={`/categoria/${category.slug}`} className="bp-cat-pill">
@@ -74,6 +78,8 @@ export default async function HomePage() {
         </Card>
       </section>
 
+      {highlights.length > 0 ? <HighlightCarousel highlights={highlights} /> : null}
+
       <section className="space-y-4">
         <div className="bp-section-header">
           <div>
@@ -81,13 +87,16 @@ export default async function HomePage() {
             <h2 className="bp-section-title">Produtos em destaque</h2>
           </div>
           <Link href="/produtos" className="bp-view-all">
-            Ver todos -&gt;
+            Ver todos
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M1 7h12M8 2l5 5-5 5" />
+            </svg>
           </Link>
         </div>
         {products.length === 0 ? (
           <EmptyState
             title="Nenhum produto ativo cadastrado."
-            description="Cadastre produtos na area administrativa para liberar o catalogo."
+            description="Cadastre produtos na área administrativa para liberar o catálogo."
           />
         ) : (
           <div className="bp-product-grid">
