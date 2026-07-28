@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { ImageUploadField } from "@/components/admin/image-upload-field";
 import { getErrorMessage } from "@/lib/errors";
 import { createHighlightSchema, type CreateHighlightInput } from "@/lib/validations";
 import type { HighlightDTO } from "@/types/highlight";
@@ -32,7 +33,7 @@ export function HighlightForm({ highlight, defaultOrder = 0 }: HighlightFormProp
       order: highlight?.order ?? defaultOrder,
     },
   });
-  const imageUrl = form.watch("imageUrl");
+  const imageUrl = useWatch({ control: form.control, name: "imageUrl" });
 
   const onSubmit = form.handleSubmit(async (values) => {
     setSubmitError("");
@@ -82,6 +83,11 @@ export function HighlightForm({ highlight, defaultOrder = 0 }: HighlightFormProp
         <div>
           <label className="mb-1.5 block text-sm font-medium text-stone-700">URL da imagem</label>
           <Input placeholder="https://..." {...form.register("imageUrl")} />
+          <ImageUploadField
+            onUploaded={(url) => {
+              form.setValue("imageUrl", url, { shouldDirty: true, shouldValidate: true });
+            }}
+          />
           {form.formState.errors.imageUrl?.message ? (
             <p className="mt-1 text-xs text-rose-600">{form.formState.errors.imageUrl.message}</p>
           ) : null}

@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { ImageUploadField } from "@/components/admin/image-upload-field";
 import { getErrorMessage } from "@/lib/errors";
 import { createProductSchema, type CreateProductInput } from "@/lib/validations";
 import type { CategoryListItem } from "@/types/category";
@@ -43,6 +44,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
     name: "flavors",
     keyName: "fieldKey",
   });
+  const imageUrl = useWatch({ control: form.control, name: "imageUrl" });
 
   const onSubmit = form.handleSubmit(async (values) => {
     setSubmitError("");
@@ -100,6 +102,24 @@ export function ProductForm({ product, categories }: ProductFormProps) {
         <div>
           <label className="mb-2 block text-sm font-medium">URL da imagem</label>
           <Input {...form.register("imageUrl")} />
+          <ImageUploadField
+            onUploaded={(url) => {
+              form.setValue("imageUrl", url, { shouldDirty: true, shouldValidate: true });
+            }}
+          />
+          {imageUrl ? (
+            <div className="mt-3 overflow-hidden rounded-xl border border-stone-200 bg-stone-50">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={imageUrl}
+                alt="Pré-visualização do produto"
+                className="h-40 w-full object-contain"
+                onError={(event) => {
+                  (event.currentTarget as HTMLImageElement).style.display = "none";
+                }}
+              />
+            </div>
+          ) : null}
         </div>
         <div className="grid gap-4 md:grid-cols-3">
           <div>

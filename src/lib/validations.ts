@@ -10,6 +10,20 @@ const trimmedString = (label: string, min = 2) =>
 const decimalNumber = (label: string) =>
   z.number({ error: `${label} e obrigatorio.` }).min(0, `${label} nao pode ser negativo.`);
 
+const imageUrlSchema = z
+  .string()
+  .trim()
+  .refine(
+    (value) => {
+      if (value.startsWith("/uploads/")) {
+        return /^\/uploads\/[a-zA-Z0-9][a-zA-Z0-9._-]*$/.test(value);
+      }
+
+      return z.url().safeParse(value).success;
+    },
+    { message: "Informe uma URL valida para a imagem." },
+  );
+
 const productFlavorSchema = z.object({
   id: z.number().int().positive().optional(),
   name: trimmedString("Sabor", 1),
@@ -29,7 +43,7 @@ export const createProductSchema = z
     slug: z.string().trim().optional(),
     description: z.string().trim().max(1000, "Descricao muito longa.").optional().or(z.literal("")),
     price: decimalNumber("Preco"),
-    imageUrl: z.string().trim().url("Informe uma URL valida para a imagem.").optional().or(z.literal("")),
+    imageUrl: imageUrlSchema.optional().or(z.literal("")),
     sku: trimmedString("SKU", 1),
     active: z.boolean(),
     categoryId: z.number().int().positive("Categoria e obrigatoria."),
@@ -121,7 +135,7 @@ export const createHighlightSchema = z.object({
     .string()
     .trim()
     .min(1, "Imagem é obrigatória.")
-    .url("Informe uma URL válida para a imagem."),
+    .pipe(imageUrlSchema),
   buttonText: z.string().trim().max(40, "Texto do botão muito longo.").optional().or(z.literal("")),
   buttonLink: z.string().trim().max(500, "Link muito longo.").optional().or(z.literal("")),
   active: z.boolean(),
