@@ -190,12 +190,14 @@ button {
 }
 
 .bp-logo-icon {
+  position: relative;
   display: flex;
   width: 44px;
   height: 44px;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
   border: 1px solid rgba(255, 255, 255, .1);
   border-radius: 14px;
   background: #ffffff;
@@ -207,7 +209,7 @@ button {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .bp-logo:hover .bp-logo-icon {
@@ -1082,7 +1084,7 @@ button {
   }
 
   .bp-container {
-    padding: 0 .8rem;
+    padding:  1.0rem;
   }
 
   .bp-logo-icon {
