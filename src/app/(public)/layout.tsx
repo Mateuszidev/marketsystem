@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
+import { MobileCartBar } from "@/components/cart/mobile-cart-bar";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { storeService } from "@/services/store-service";
@@ -24,6 +25,7 @@ export default async function PublicLayout({ children }: { children: ReactNode }
       <SiteHeader storeName={settings.storeName} />
       <main className="bp-container bp-main">{children}</main>
       <SiteFooter />
+      <MobileCartBar />
     </div>
   );
 }

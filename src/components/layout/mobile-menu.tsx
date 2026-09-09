@@ -1,8 +1,8 @@
 "use client";
 
+/* eslint-disable @next/next/no-html-link-for-pages */
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import Link from "next/link";
 
 export function MobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,18 +11,18 @@ export function MobileMenu() {
     <div className="bp-mobile-menu" onClick={() => setIsOpen(false)}>
       <div className="bp-mobile-menu-panel" onClick={(e) => e.stopPropagation()}>
         <nav className="bp-mobile-nav">
-          <Link href="/" className="bp-mobile-nav-link" onClick={() => setIsOpen(false)}>
+          <a href="/" className="bp-mobile-nav-link" onClick={() => setIsOpen(false)}>
             Início
-          </Link>
-          <Link href="/produtos" className="bp-mobile-nav-link" onClick={() => setIsOpen(false)}>
+          </a>
+          <a href="/produtos" className="bp-mobile-nav-link" onClick={() => setIsOpen(false)}>
             Produtos
-          </Link>
-          <Link href="/carrinho" className="bp-mobile-nav-link" onClick={() => setIsOpen(false)}>
+          </a>
+          <a href="/carrinho" className="bp-mobile-nav-link" onClick={() => setIsOpen(false)}>
             Carrinho
-          </Link>
-          <Link href="/admin" className="bp-mobile-nav-link" onClick={() => setIsOpen(false)}>
+          </a>
+          <a href="/admin" className="bp-mobile-nav-link" onClick={() => setIsOpen(false)}>
             Admin
-          </Link>
+          </a>
         </nav>
       </div>
     </div>
