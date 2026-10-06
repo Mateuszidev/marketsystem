@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { formatCurrencyBRL } from "@/lib/currency";
+import { ProductPrice } from "@/components/product/product-price";
 import { useCartStore } from "@/store/cart-store";
 import type { ProductFlavorDTO, PublicProductListItem } from "@/types/product";
 
@@ -101,7 +101,7 @@ export function ProductCard({ product }: { product: PublicProductListItem }) {
           ) : null}
           {product.description ? <p className="bp-product-desc mt-2 line-clamp-2 text-sm leading-relaxed">{product.description}</p> : null}
           <div className="bp-product-footer mt-auto">
-            <p className="bp-product-price">{formatCurrencyBRL(product.price)}</p>
+            <ProductPrice price={product.price} originalPrice={product.originalPrice} />
             <Button
               className="shrink-0 px-4 py-2 text-xs"
               variant={product.available ? "primary" : "secondary"}
@@ -152,7 +152,7 @@ export function ProductCard({ product }: { product: PublicProductListItem }) {
             </div>
 
             {product.description ? <p className="mt-3 text-sm leading-relaxed text-[var(--color-soft-text)]">{product.description}</p> : null}
-            <p className="mt-4 text-2xl font-black text-[var(--color-text)]">{formatCurrencyBRL(product.price)}</p>
+            <div className="mt-4"><ProductPrice price={product.price} originalPrice={product.originalPrice} /></div>
 
             {hasFlavors ? (
               <div className="mt-5">

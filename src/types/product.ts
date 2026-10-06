@@ -10,6 +10,7 @@ export type PublicProductListItem = {
   slug: string;
   description: string | null;
   price: number;
+  originalPrice: number | null;
   imageUrl: string | null;
   categoryId: number;
   categoryName: string;
@@ -27,6 +28,7 @@ export type AdminProductListItem = PublicProductListItem & {
 };
 
 export type ProductFilters = {
+  ids?: number[];
   categorySlug?: string;
   search?: string;
   includeInactive?: boolean;

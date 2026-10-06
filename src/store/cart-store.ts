@@ -27,6 +27,7 @@ type CartState = {
   decreaseItem: (itemKey: string) => void;
   removeItem: (itemKey: string) => void;
   clearCart: () => void;
+  syncProducts: (products: PublicProductListItem[]) => void;
   totalItems: () => number;
   subtotal: () => number;
 };
@@ -49,7 +50,7 @@ export const useCartStore = create<CartState>()(
           if (existing) {
             return {
               items: state.items.map((item) =>
-                getCartItemKey(item) === nextItemKey ? { ...item, quantity: item.quantity + 1 } : item,
+                getCartItemKey(item) === nextItemKey ? { ...item, price: product.price, quantity: item.quantity + 1 } : item,
               ),
             };
           }
@@ -89,6 +90,12 @@ export const useCartStore = create<CartState>()(
           items: state.items.filter((item) => getCartItemKey(item) !== itemKey),
         })),
       clearCart: () => set({ items: [] }),
+      syncProducts: (products) => set((state) => ({
+        items: state.items.map((item) => {
+          const product = products.find((entry) => entry.id === item.productId);
+          return product ? { ...item, price: product.price, available: product.available, name: product.name } : { ...item, available: false };
+        }),
+      })),
       totalItems: () => get().items.reduce((sum, item) => sum + item.quantity, 0),
       subtotal: () => get().items.reduce((sum, item) => sum + item.price * item.quantity, 0),
     }),

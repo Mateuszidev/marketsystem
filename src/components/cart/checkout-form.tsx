@@ -11,6 +11,7 @@ import { formatCurrencyBRL } from "@/lib/currency";
 import { getErrorMessage } from "@/lib/errors";
 import { createOrderSchema, type CreateOrderInput } from "@/lib/validations";
 import { useCartStore } from "@/store/cart-store";
+import { fetchCartProducts } from "@/lib/cart-prices";
 import type { FulfillmentType, StoreSettingsDTO } from "@/types/order";
 
 export function CheckoutForm({ settings }: { settings: StoreSettingsDTO }) {
@@ -86,6 +87,23 @@ export function CheckoutForm({ settings }: { settings: StoreSettingsDTO }) {
     }
 
     setSubmitError("");
+
+    try {
+      const products = await fetchCartProducts(items.map((item) => item.productId));
+      const changed = items.some((item) => products.find((product) => product.id === item.productId)?.price !== item.price);
+      useCartStore.getState().syncProducts(products);
+      if (products.length < new Set(items.map((item) => item.productId)).size || products.some((product) => !product.available)) {
+        setSubmitError("Um produto ficou indisponivel. Revise seu carrinho.");
+        return;
+      }
+      if (changed) {
+        setSubmitError("Os precos foram atualizados. Confira o novo total e confirme o pedido novamente.");
+        return;
+      }
+    } catch {
+      setSubmitError("Nao foi possivel conferir os precos. Tente novamente.");
+      return;
+    }
 
     const response = await fetch("/api/orders", {
       method: "POST",

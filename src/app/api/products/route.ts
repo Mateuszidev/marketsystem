@@ -21,12 +21,15 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const search = url.searchParams.get("search") || "";
     const category = url.searchParams.get("category") || "";
+    const idsParam = url.searchParams.get("ids");
+    const ids = idsParam === null ? undefined : [...new Set(idsParam.split(",").map(Number).filter((id) => Number.isInteger(id) && id > 0))].slice(0, 100);
     const includeInactive =
       url.searchParams.get("includeInactive") === "true" && Boolean(await getAdminSession());
 
     return jsonSuccess(
       await productService.listPublic({
         search,
+        ids,
         categorySlug: category,
         includeInactive,
         page: parsePositiveInt(url.searchParams.get("page"), 1),

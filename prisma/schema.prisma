@@ -37,6 +37,7 @@ model Product {
   slug        String      @unique
   description String?
   price       Decimal     @db.Decimal(10, 2)
+  originalPrice Decimal?  @db.Decimal(10, 2)
   imageUrl    String?
   sku         String      @unique
   active      Boolean     @default(true)

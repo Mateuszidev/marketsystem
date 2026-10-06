@@ -30,11 +30,12 @@ const featuredCategoryOrderIndex = new Map(
 );
 
 export default async function HomePage() {
-  const [categories, products, settings, highlights] = await Promise.all([
+  const [categories, products, settings, highlights, promotions] = await Promise.all([
     categoryService.list(),
     productService.listPublic(),
     storeService.getPublic(),
     highlightService.listPublic(),
+    productService.listPromotions(),
   ]);
   const storeName = settings.storeName.trim() || "MarketSystem";
   const featuredCategories = [...categories].sort((a, b) => {
@@ -79,6 +80,17 @@ export default async function HomePage() {
       </section>
 
       {highlights.length > 0 ? <HighlightCarousel highlights={highlights} /> : null}
+
+      {promotions.length > 0 ? (
+        <section className="space-y-4" aria-labelledby="promotions-title">
+          <div className="bp-section-header">
+            <h2 id="promotions-title" className="bp-section-title">Em promoção</h2>
+          </div>
+          <div className="bp-product-grid">
+            {promotions.map((product) => <ProductCard key={product.id} product={product} />)}
+          </div>
+        </section>
+      ) : null}
 
       <section className="space-y-4">
         <div className="bp-section-header">

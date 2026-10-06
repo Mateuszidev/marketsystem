@@ -15,6 +15,7 @@ const publicProductSelect = {
   slug: true,
   description: true,
   price: true,
+  originalPrice: true,
   imageUrl: true,
   categoryId: true,
   category: {
@@ -58,6 +59,7 @@ const mapPublicProduct = (product: {
   slug: string;
   description: string | null;
   price: unknown;
+  originalPrice: unknown;
   imageUrl: string | null;
   categoryId: number;
   category: { name: string };
@@ -69,6 +71,7 @@ const mapPublicProduct = (product: {
   slug: product.slug,
   description: product.description,
   price: decimalToNumber(product.price as never),
+  originalPrice: product.originalPrice == null ? null : decimalToNumber(product.originalPrice as never),
   imageUrl: product.imageUrl,
   categoryId: product.categoryId,
   categoryName: product.category.name,
@@ -86,6 +89,7 @@ const mapAdminProduct = (product: {
   slug: string;
   description: string | null;
   price: unknown;
+  originalPrice: unknown;
   imageUrl: string | null;
   sku: string;
   active: boolean;
@@ -113,6 +117,7 @@ const normalizeFlavors = (flavors: CreateProductInput["flavors"]) =>
   }));
 
 const buildWhere = (filters: ProductFilters) => ({
+  id: filters.ids ? { in: filters.ids } : undefined,
   active: filters.includeInactive ? undefined : true,
   name: filters.search
     ? {
@@ -149,6 +154,15 @@ const ensureUniqueFields = async (slug: string, sku: string, excludeId?: number)
 };
 
 export const productService = {
+  async listPromotions() {
+    const products = await prisma.product.findMany({
+      where: { active: true, originalPrice: { not: null } },
+      select: publicProductSelect,
+      orderBy: { updatedAt: "desc" },
+      take: 8,
+    });
+    return products.map(mapPublicProduct);
+  },
   async listPublic(filters: ProductFilters = {}) {
     const products = await prisma.product.findMany({
       where: buildWhere(filters),
@@ -200,6 +214,7 @@ export const productService = {
         slug,
         description: input.description?.trim() || null,
         price: toDecimal(input.price),
+        originalPrice: input.originalPrice == null ? null : toDecimal(input.originalPrice),
         imageUrl: input.imageUrl?.trim() || null,
         sku: input.sku.trim(),
         active: input.active,
@@ -243,6 +258,7 @@ export const productService = {
           slug,
           description: input.description?.trim() || null,
           price: toDecimal(input.price),
+          originalPrice: input.originalPrice == null ? null : toDecimal(input.originalPrice),
           imageUrl: input.imageUrl?.trim() || null,
           sku: input.sku.trim(),
           active: input.active,

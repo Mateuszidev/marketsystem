@@ -14,6 +14,8 @@ import { getErrorMessage } from "@/lib/errors";
 import { createProductSchema, type CreateProductInput } from "@/lib/validations";
 import type { CategoryListItem } from "@/types/category";
 import type { AdminProductListItem } from "@/types/product";
+import { discountPercentage } from "@/lib/promotion";
+import { ProductPrice } from "@/components/product/product-price";
 
 type ProductFormProps = {
   product?: AdminProductListItem;
@@ -23,6 +25,7 @@ type ProductFormProps = {
 export function ProductForm({ product, categories }: ProductFormProps) {
   const router = useRouter();
   const [submitError, setSubmitError] = useState("");
+  const [promotionEnabled, setPromotionEnabled] = useState(product?.originalPrice != null);
   const form = useForm<CreateProductInput>({
     resolver: zodResolver(createProductSchema),
     defaultValues: {
@@ -30,6 +33,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
       slug: product?.slug || "",
       description: product?.description || "",
       price: product?.price || 0,
+      originalPrice: product?.originalPrice ?? null,
       imageUrl: product?.imageUrl || "",
       sku: product?.sku || "",
       active: product?.active ?? true,
@@ -45,9 +49,15 @@ export function ProductForm({ product, categories }: ProductFormProps) {
     keyName: "fieldKey",
   });
   const imageUrl = useWatch({ control: form.control, name: "imageUrl" });
+  const price = useWatch({ control: form.control, name: "price" });
+  const originalPrice = useWatch({ control: form.control, name: "originalPrice" });
 
   const onSubmit = form.handleSubmit(async (values) => {
     setSubmitError("");
+    if (promotionEnabled && values.originalPrice == null) {
+      form.setError("originalPrice", { message: "Informe o preco anterior da promocao." });
+      return;
+    }
 
     const response = await fetch(product ? `/api/products/${product.id}` : "/api/products", {
       method: product ? "PUT" : "POST",
@@ -123,8 +133,9 @@ export function ProductForm({ product, categories }: ProductFormProps) {
         </div>
         <div className="grid gap-4 md:grid-cols-3">
           <div>
-            <label className="mb-2 block text-sm font-medium">Preço</label>
+            <label className="mb-2 block text-sm font-medium">{promotionEnabled ? "Preço promocional" : "Preço"}</label>
             <Input type="number" step="0.01" {...form.register("price", { valueAsNumber: true })} />
+            <p className="mt-1 text-sm text-rose-600">{form.formState.errors.price?.message}</p>
           </div>
           <div>
             <label className="mb-2 block text-sm font-medium">Estoque atual</label>
@@ -135,6 +146,29 @@ export function ProductForm({ product, categories }: ProductFormProps) {
             <Input type="number" {...form.register("minQuantity", { valueAsNumber: true })} />
           </div>
         </div>
+        <label className="inline-flex items-center gap-2 text-sm font-medium">
+          <input type="checkbox" checked={promotionEnabled} onChange={(event) => {
+            const enabled = event.target.checked;
+            setPromotionEnabled(enabled);
+            form.setValue("originalPrice", enabled ? form.getValues("price") : null, { shouldDirty: true, shouldValidate: true });
+          }} />
+          Produto em promoção
+        </label>
+        {promotionEnabled ? (
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label htmlFor="original-price" className="mb-2 block text-sm font-medium">Preço anterior</label>
+              <Input id="original-price" type="number" min="0.01" step="0.01" {...form.register("originalPrice", { setValueAs: (value) => value === "" ? null : Number(value) })} />
+              <p className="mt-1 text-sm text-rose-600">{form.formState.errors.originalPrice?.message}</p>
+            </div>
+            {discountPercentage(price, originalPrice) !== null ? <ProductPrice price={price} originalPrice={originalPrice ?? null} /> : null}
+            <Button type="button" variant="secondary" onClick={() => {
+              if (originalPrice != null) form.setValue("price", originalPrice, { shouldDirty: true, shouldValidate: true });
+              form.setValue("originalPrice", null, { shouldDirty: true, shouldValidate: true });
+              setPromotionEnabled(false);
+            }}>Encerrar promoção e restaurar preço anterior</Button>
+          </div>
+        ) : null}
         <label className="inline-flex items-center gap-2 text-sm font-medium">
           <input type="checkbox" {...form.register("active")} />
           Produto ativo no catálogo

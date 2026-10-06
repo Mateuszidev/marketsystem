@@ -42,7 +42,8 @@ export const createProductSchema = z
     name: trimmedString("Nome"),
     slug: z.string().trim().optional(),
     description: z.string().trim().max(1000, "Descricao muito longa.").optional().or(z.literal("")),
-    price: decimalNumber("Preco"),
+    price: decimalNumber("Preco").multipleOf(0.01, "Use no maximo duas casas decimais."),
+    originalPrice: z.number().positive("Preco anterior deve ser positivo.").multipleOf(0.01, "Use no maximo duas casas decimais.").nullable().optional(),
     imageUrl: imageUrlSchema.optional().or(z.literal("")),
     sku: trimmedString("SKU", 1),
     active: z.boolean(),
@@ -52,6 +53,9 @@ export const createProductSchema = z
     flavors: z.array(productFlavorSchema),
   })
   .superRefine((values, context) => {
+    if (values.originalPrice != null && (values.price <= 0 || values.originalPrice <= values.price)) {
+      context.addIssue({ code: "custom", path: ["originalPrice"], message: "O preco anterior deve ser maior que o atual, e o atual deve ser positivo." });
+    }
     const flavorNames = new Set<string>();
 
     values.flavors.forEach((flavor, index) => {

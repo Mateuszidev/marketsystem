@@ -612,10 +612,9 @@ button {
 }
 
 .bp-hero-title span {
-  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand-dark) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  background: none;
+  color: #ff0000;
+  -webkit-text-fill-color: #7e1111;
 }
 
 .bp-hero-desc {
@@ -911,7 +910,30 @@ button {
   margin-top: 1rem;
   padding-top: .75rem;
   border-top: 1px solid rgba(0, 0, 0, .05);
+  flex-wrap: wrap;
 }
+
+.bp-product-pricing { min-width: 0; }
+.bp-product-promotion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .35rem;
+  margin-bottom: .25rem;
+  font-size: 12px;
+  letter-spacing: 0;
+}
+.bp-product-promotion del { color: #64748b; overflow-wrap: anywhere; }
+.bp-discount-badge {
+  background: var(--color-accent-light);
+  color: #9a3412;
+  padding: .2rem .4rem;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.bp-product-pricing .bp-product-price { letter-spacing: 0; overflow-wrap: anywhere; }
 
 .bp-product-price,
 .card .bp-product-price {
